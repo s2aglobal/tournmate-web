@@ -5,3 +5,15 @@
 .vscode/
 .idea/
 node_modules/
+
+# Security — prevent accidental secret commits
+.env
+.env.*
+*.pem
+*.p12
+*.key
+*.keystore
+*-sa.json
+*service-account*.json
+GoogleService-Info*.plist
+firebase-debug.log
