@@ -93,11 +93,12 @@ export default function LoginPage() {
       await signInWithGoogle();
       await afterAuth();
     } catch (err: unknown) {
-      if (err instanceof Error && !err.message.includes("popup-closed")) {
-        setError("Google sign-in failed. Please try again.");
-      }
-    } finally {
       setLoading(false);
+      const msg = err instanceof Error ? err.message : "";
+      if (msg.includes("popup-closed") || msg.includes("cancelled-popup-request")) {
+        return;
+      }
+      setError("Google sign-in failed. Please try again.");
     }
   }
 
@@ -108,11 +109,12 @@ export default function LoginPage() {
       await signInWithApple();
       await afterAuth();
     } catch (err: unknown) {
-      if (err instanceof Error && !err.message.includes("popup-closed")) {
-        setError("Apple sign-in failed. Please try again.");
-      }
-    } finally {
       setLoading(false);
+      const msg = err instanceof Error ? err.message : "";
+      if (msg.includes("popup-closed") || msg.includes("cancelled-popup-request")) {
+        return;
+      }
+      setError("Apple sign-in failed. Please try again.");
     }
   }
 
