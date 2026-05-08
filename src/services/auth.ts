@@ -6,6 +6,7 @@ import {
   OAuthProvider,
   signOut as firebaseSignOut,
   sendPasswordResetEmail,
+  sendEmailVerification as firebaseSendEmailVerification,
   type User,
 } from "firebase/auth";
 import { auth } from "./firebase";
@@ -55,4 +56,39 @@ export async function signOut(): Promise<void> {
 
 export function getCurrentUser(): User | null {
   return auth.currentUser;
+}
+
+export async function sendEmailVerification(): Promise<void> {
+  const user = auth.currentUser;
+  if (user) await firebaseSendEmailVerification(user);
+}
+
+export async function reloadCurrentUser(): Promise<User | null> {
+  const user = auth.currentUser;
+  if (user) {
+    await user.reload();
+    return auth.currentUser;
+  }
+  return null;
+}
+
+/**
+ * Whether email verification is required in the current environment.
+ * Production enforces verification; dev skips it for testing convenience.
+ */
+export function isVerificationRequired(): boolean {
+  return import.meta.env.PROD;
+}
+
+/**
+ * Whether the given user needs email verification.
+ * Google/Apple users are already verified by their provider.
+ */
+export function needsEmailVerification(user: User): boolean {
+  if (!isVerificationRequired()) return false;
+  if (user.emailVerified) return false;
+  const isOAuth = user.providerData.some(
+    (p) => p.providerId === "google.com" || p.providerId === "apple.com"
+  );
+  return !isOAuth;
 }

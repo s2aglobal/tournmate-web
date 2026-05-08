@@ -6,6 +6,8 @@ import {
   signInWithGoogle,
   signInWithApple,
   resetPassword,
+  sendEmailVerification,
+  isVerificationRequired,
 } from "../services/auth";
 import { useAuth } from "../hooks/useAuth";
 
@@ -52,6 +54,11 @@ export default function LoginPage() {
     try {
       if (tab === "signup") {
         await signUpWithEmail(email, password);
+        if (isVerificationRequired()) {
+          await sendEmailVerification();
+          navigate("/verify-email");
+          return;
+        }
       } else {
         await signInWithEmail(email, password);
       }
