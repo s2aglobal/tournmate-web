@@ -93,12 +93,13 @@ export default function LoginPage() {
       await signInWithGoogle();
       await afterAuth();
     } catch (err: unknown) {
-      setLoading(false);
       const msg = err instanceof Error ? err.message : "";
-      if (msg.includes("popup-closed") || msg.includes("cancelled-popup-request")) {
-        return;
+      const dismissed = msg.includes("popup-closed") || msg.includes("cancelled-popup-request") || msg.includes("popup-blocked");
+      if (!dismissed) {
+        setError("Google sign-in failed. Please try again.");
       }
-      setError("Google sign-in failed. Please try again.");
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -109,12 +110,13 @@ export default function LoginPage() {
       await signInWithApple();
       await afterAuth();
     } catch (err: unknown) {
-      setLoading(false);
       const msg = err instanceof Error ? err.message : "";
-      if (msg.includes("popup-closed") || msg.includes("cancelled-popup-request")) {
-        return;
+      const dismissed = msg.includes("popup-closed") || msg.includes("cancelled-popup-request") || msg.includes("popup-blocked");
+      if (!dismissed) {
+        setError("Apple sign-in failed. Please try again.");
       }
-      setError("Apple sign-in failed. Please try again.");
+    } finally {
+      setLoading(false);
     }
   }
 
