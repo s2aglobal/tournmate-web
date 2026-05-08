@@ -1,0 +1,7 @@
+{
+  "projects": {
+    "default": "tournmate-dev",
+    "dev": "tournmate-dev",
+    "prod": "tournmate-prod"
+  }
+}
