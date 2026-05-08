@@ -5,10 +5,12 @@
 .vscode/
 .idea/
 node_modules/
+dist/
 
 # Security — prevent accidental secret commits
 .env
 .env.*
+!.env.example
 *.pem
 *.p12
 *.key
@@ -17,3 +19,5 @@ node_modules/
 *service-account*.json
 GoogleService-Info*.plist
 firebase-debug.log
+.firebase/
+tsconfig.tsbuildinfo
