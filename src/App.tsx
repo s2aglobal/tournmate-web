@@ -10,6 +10,7 @@ import LoginPage from "./pages/LoginPage";
 import EmailVerificationPage from "./pages/EmailVerificationPage";
 import ProfileSetupPage from "./pages/ProfileSetupPage";
 import DashboardPage from "./pages/DashboardPage";
+import ProfilePage from "./pages/ProfilePage";
 import type { ReactNode } from "react";
 
 function LoadingScreen() {
@@ -98,6 +99,14 @@ function AppRoutes() {
           element={
             <ProfileGate>
               <DashboardPage />
+            </ProfileGate>
+          }
+        />
+        <Route
+          path="/profile"
+          element={
+            <ProfileGate>
+              <ProfilePage />
             </ProfileGate>
           }
         />
