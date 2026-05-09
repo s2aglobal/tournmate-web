@@ -715,3 +715,210 @@ a { text-decoration: none; color: inherit; }
 }
 .wizard-buttons .btn-primary,
 .wizard-buttons .btn-outline { width: 100%; }
+
+/* ═══════════════════════════════════════════════════════
+   TOURNAMENT PAGES
+   ═══════════════════════════════════════════════════════ */
+
+.tourn-page { min-height: 100vh; padding: 80px 24px 60px; background: var(--gray-50); }
+.tourn-page-inner { max-width: 900px; margin: 0 auto; }
+.tourn-page-header {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 24px; flex-wrap: wrap; gap: 12px;
+}
+.tourn-page-header h1 {
+  font-size: 2rem; font-weight: 800; color: var(--dark-navy); letter-spacing: -0.03em;
+}
+.tourn-empty {
+  text-align: center; padding: 60px 24px; color: var(--gray-500); font-size: 1rem;
+}
+.tourn-grid { display: flex; flex-direction: column; gap: 16px; }
+
+/* ── Tournament Card ───────────────────────────────── */
+.tourn-card {
+  display: block; background: var(--white); border-radius: 16px; padding: 20px 24px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.05); transition: transform 0.15s, box-shadow 0.15s;
+  border: 1px solid var(--gray-100);
+}
+.tourn-card:hover { transform: translateY(-2px); box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
+.tourn-card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+.tourn-card-badges { display: flex; gap: 6px; }
+.tourn-badge {
+  display: inline-block; padding: 3px 10px; border-radius: 100px;
+  font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em;
+}
+.tourn-badge.format { background: var(--brand-purple); color: white; }
+.tourn-badge.match-fmt { background: var(--gray-100); color: var(--gray-600); }
+.tourn-status { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; }
+.tourn-card-title {
+  font-size: 1.15rem; font-weight: 700; color: var(--dark-navy); margin-bottom: 6px;
+  letter-spacing: -0.01em;
+}
+.tourn-card-meta { font-size: 0.85rem; color: var(--gray-500); display: flex; gap: 16px; flex-wrap: wrap; }
+.tourn-card-address { font-size: 0.8rem; color: var(--gray-400); margin-top: 4px; }
+.tourn-card-footer {
+  display: flex; gap: 16px; margin-top: 12px; font-size: 0.8rem; color: var(--gray-500); flex-wrap: wrap;
+}
+.tourn-fee { font-weight: 700; color: var(--brand-purple); }
+.tourn-prize {
+  margin-top: 8px; padding: 8px 12px; background: rgba(245,158,11,0.08);
+  border-radius: 8px; font-size: 0.8rem; color: #92400E; font-weight: 500;
+}
+
+/* ── Tournament Detail ─────────────────────────────── */
+.tourn-detail-header {
+  display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;
+}
+.tourn-detail-title {
+  font-size: 1.8rem; font-weight: 800; color: var(--dark-navy);
+  letter-spacing: -0.03em; margin-bottom: 16px;
+}
+
+/* ── Info Tab ──────────────────────────────────────── */
+.info-tab { display: flex; flex-direction: column; gap: 16px; }
+.info-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+  background: var(--white); border-radius: 16px; padding: 20px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+}
+.info-item { display: flex; flex-direction: column; gap: 4px; }
+.info-label { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--gray-400); }
+.info-value { font-size: 0.9rem; font-weight: 600; color: var(--dark-navy); }
+.info-card {
+  background: var(--white); border-radius: 16px; padding: 20px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+}
+.info-card.prize { border-left: 4px solid #F59E0B; }
+.info-value-lg { font-size: 1.1rem; font-weight: 700; color: var(--dark-navy); margin-top: 4px; }
+.info-hint { font-size: 0.8rem; color: var(--gray-400); margin-top: 4px; }
+
+/* ── Teams Tab ─────────────────────────────────────── */
+.teams-tab { }
+.tab-section-title {
+  font-size: 0.75rem; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.06em; color: var(--gray-500); margin-bottom: 12px;
+}
+.tab-empty { text-align: center; padding: 40px; color: var(--gray-400); font-size: 0.9rem; }
+.team-list { display: flex; flex-direction: column; gap: 8px; }
+.team-row {
+  display: flex; align-items: center; gap: 12px; padding: 12px 16px;
+  background: var(--white); border-radius: 12px;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.04); border: 1px solid var(--gray-100);
+}
+.team-avatar { width: 36px; height: 36px; border-radius: 50%; }
+.team-info { flex: 1; }
+.team-name { font-weight: 600; color: var(--dark-navy); font-size: 0.9rem; display: block; }
+.team-partner { font-size: 0.8rem; color: var(--gray-500); }
+.team-elo { font-size: 0.8rem; font-weight: 600; color: var(--brand-purple); }
+
+/* ── Matches Tab ───────────────────────────────────── */
+.matches-tab { }
+.round-chips { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+.round-chip {
+  padding: 6px 16px; border-radius: 100px; font-size: 0.8rem; font-weight: 600;
+  border: 1.5px solid var(--gray-200); background: var(--white); color: var(--gray-600);
+  cursor: pointer; transition: all 0.15s; font-family: var(--font-sans);
+}
+.round-chip:hover { border-color: var(--brand-purple); }
+.round-chip.active { background: var(--brand-purple); color: white; border-color: var(--brand-purple); }
+.match-list { display: flex; flex-direction: column; gap: 10px; }
+.match-card {
+  display: flex; justify-content: space-between; align-items: center; gap: 12px;
+  padding: 14px 18px; background: var(--white); border-radius: 12px;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.04); border: 1px solid var(--gray-100);
+  transition: background 0.15s;
+}
+.match-card:hover { background: var(--gray-50); }
+.match-teams { flex: 1; display: flex; align-items: center; gap: 12px; }
+.match-team { font-size: 0.9rem; font-weight: 500; color: var(--gray-600); flex: 1; }
+.match-team.winner { font-weight: 700; color: var(--dark-navy); }
+.match-score { font-size: 0.85rem; font-weight: 700; color: var(--brand-purple); white-space: nowrap; }
+.match-status-badge { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; white-space: nowrap; }
+.match-group-badge {
+  font-size: 0.7rem; font-weight: 600; color: var(--gray-400);
+  background: var(--gray-50); padding: 2px 8px; border-radius: 6px;
+}
+
+/* ── Standings ─────────────────────────────────────── */
+.standings-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+.standings-table th {
+  text-align: left; font-size: 0.7rem; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.06em; color: var(--gray-400); padding: 8px 12px;
+  border-bottom: 2px solid var(--gray-200);
+}
+.standings-table td { padding: 10px 12px; border-bottom: 1px solid var(--gray-100); color: var(--gray-600); }
+.standings-table td:first-child { font-weight: 700; color: var(--brand-purple); }
+
+/* ── Manage Tab ────────────────────────────────────── */
+.manage-tab { display: flex; flex-direction: column; gap: 24px; }
+.manage-section {
+  background: var(--white); border-radius: 16px; padding: 20px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+}
+.danger-text { color: var(--danger) !important; }
+.danger-btn { border-color: var(--danger) !important; color: var(--danger) !important; }
+.danger-btn:hover { background: rgba(239,68,68,0.04) !important; }
+
+/* ── Tournament Footer ─────────────────────────────── */
+.tourn-footer {
+  position: fixed; bottom: 0; left: 0; right: 0; z-index: 100;
+  background: var(--white); border-top: 1px solid var(--gray-200);
+  padding: 12px 24px; display: flex; align-items: center; justify-content: center; gap: 16px;
+  box-shadow: 0 -4px 16px rgba(0,0,0,0.06);
+}
+.tourn-footer-fee { font-weight: 700; color: var(--dark-navy); font-size: 1rem; }
+
+/* ── Modal ─────────────────────────────────────────── */
+.modal-overlay {
+  position: fixed; inset: 0; z-index: 2000; background: rgba(0,0,0,0.5);
+  display: flex; align-items: center; justify-content: center; padding: 24px;
+}
+.modal-card {
+  background: var(--white); border-radius: 24px; padding: 32px;
+  max-width: 480px; width: 100%; max-height: 90vh; overflow-y: auto;
+  box-shadow: 0 16px 48px rgba(0,0,0,0.2);
+}
+.modal-card h2 {
+  font-size: 1.4rem; font-weight: 800; color: var(--dark-navy); margin-bottom: 4px;
+}
+
+/* ── Score Entry ───────────────────────────────────── */
+.score-sets { display: flex; flex-direction: column; gap: 12px; margin-bottom: 16px; }
+.score-set-row { display: flex; align-items: center; gap: 12px; }
+.score-set-label { font-size: 0.85rem; font-weight: 600; color: var(--gray-500); min-width: 48px; }
+.score-inputs { display: flex; align-items: center; gap: 8px; flex: 1; }
+.score-input { width: 72px !important; text-align: center; }
+.score-dash { font-weight: 700; color: var(--gray-400); }
+
+/* ── Partner List ──────────────────────────────────── */
+.partner-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
+.partner-option {
+  display: flex; align-items: center; gap: 12px; padding: 12px 16px;
+  border: 2px solid var(--gray-200); border-radius: 12px; background: var(--white);
+  cursor: pointer; transition: all 0.15s; font-family: var(--font-sans);
+  font-size: 0.9rem; font-weight: 500; color: var(--dark-navy);
+}
+.partner-option:hover { border-color: var(--gray-400); }
+.partner-option.selected { border-color: var(--brand-purple); background: rgba(125,56,237,0.04); }
+
+/* ── Review Card ───────────────────────────────────── */
+.review-card {
+  background: var(--gray-50); border-radius: 16px; padding: 20px;
+  border: 1px solid var(--gray-200);
+}
+.review-row {
+  display: flex; justify-content: space-between; padding: 8px 0;
+  border-bottom: 1px solid var(--gray-100); font-size: 0.9rem;
+}
+.review-row:last-child { border-bottom: none; }
+.review-row span { color: var(--gray-500); }
+.review-row strong { color: var(--dark-navy); }
+
+/* ── Responsive (tournaments) ──────────────────────── */
+@media (max-width: 600px) {
+  .tourn-page { padding: 70px 12px 80px; }
+  .info-grid { grid-template-columns: 1fr; }
+  .match-teams { flex-direction: column; align-items: flex-start; gap: 4px; }
+  .tourn-footer { padding: 10px 16px; }
+  .modal-card { padding: 24px 20px; }
+}
