@@ -126,6 +126,7 @@ export default function ProfileSetupPage() {
         homePostalCode: homePostalCode.trim() || undefined,
         dateOfBirth,
       });
+      await refreshPlayer();
       setStep("success");
     } catch (err: unknown) {
       const msg =
@@ -138,8 +139,7 @@ export default function ProfileSetupPage() {
     }
   }
 
-  async function goToDashboard() {
-    await refreshPlayer();
+  function goToDashboard() {
     navigate("/dashboard");
   }
 
@@ -295,27 +295,26 @@ export default function ProfileSetupPage() {
           <div className="choice-grid">
             <button
               type="button"
-              className={`choice-card${playingHand === "right" ? " selected" : ""}`}
-              onClick={() => setPlayingHand("right")}
-            >
-              <span className="choice-icon">&#x1F91A;</span>
-              <span className="choice-label">Right Handed</span>
-            </button>
-            <button
-              type="button"
               className={`choice-card${playingHand === "left" ? " selected" : ""}`}
               onClick={() => setPlayingHand("left")}
             >
               <span className="choice-icon">&#x270B;</span>
               <span className="choice-label">Left Handed</span>
             </button>
+            <button
+              type="button"
+              className={`choice-card${playingHand === "right" ? " selected" : ""}`}
+              onClick={() => setPlayingHand("right")}
+            >
+              <span className="choice-icon">&#x1F91A;</span>
+              <span className="choice-label">Right Handed</span>
+            </button>
           </div>
 
-          <div style={{ display: "flex", gap: 12, marginTop: 32 }}>
+          <div className="wizard-buttons">
             <button
               type="button"
               className="btn-outline"
-              style={{ flex: 1 }}
               onClick={() => setStep("profile")}
             >
               Back
@@ -323,7 +322,6 @@ export default function ProfileSetupPage() {
             <button
               type="button"
               className="btn-primary"
-              style={{ flex: 2 }}
               onClick={handleHandNext}
             >
               Next
@@ -359,11 +357,10 @@ export default function ProfileSetupPage() {
             ))}
           </div>
 
-          <div style={{ display: "flex", gap: 12, marginTop: 32 }}>
+          <div className="wizard-buttons">
             <button
               type="button"
               className="btn-outline"
-              style={{ flex: 1 }}
               onClick={() => setStep("hand")}
             >
               Back
@@ -371,7 +368,6 @@ export default function ProfileSetupPage() {
             <button
               type="button"
               className="btn-primary"
-              style={{ flex: 2 }}
               onClick={handleSkillDone}
               disabled={loading}
             >
