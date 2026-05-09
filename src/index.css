@@ -583,7 +583,7 @@ a { text-decoration: none; color: inherit; }
   .phone-frame { border-radius: 32px; padding: 8px; }
   .phone-screen { border-radius: 26px; }
   .phone-screen::before { width: 56px; height: 16px; top: 5px; }
-  .nav-links a:not(.nav-cta) { display: none; }
+  .nav-links > a:not(.nav-cta) { display: none; }
   .nav-dropdown { right: -8px; }
   .how-it-works { padding: 80px 16px; }
   .cta-section { padding: 80px 16px; }
