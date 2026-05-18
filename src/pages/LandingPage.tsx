@@ -21,7 +21,7 @@ export default function LandingPage() {
             </p>
             <div className="hero-actions">
               <a
-                href="https://apps.apple.com/app/tournmate"
+                href="https://apps.apple.com/us/app/tournmate/id6765781689"
                 className="store-badge"
               >
                 <img
@@ -454,7 +454,7 @@ export default function LandingPage() {
             today.
           </p>
           <a
-            href="https://apps.apple.com/app/tournmate"
+            href="https://apps.apple.com/us/app/tournmate/id6765781689"
             className="store-badge"
           >
             <img

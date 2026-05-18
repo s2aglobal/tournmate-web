@@ -1,7 +1,7 @@
 import { QRCodeSVG } from "qrcode.react";
 import { useAuth } from "../hooks/useAuth";
 
-const APP_STORE_URL = "https://apps.apple.com/app/tournmate";
+const APP_STORE_URL = "https://apps.apple.com/us/app/tournmate/id6765781689";
 
 function avatarUrl(seed: string, style: string) {
   return `https://api.dicebear.com/9.x/${style}/svg?seed=${encodeURIComponent(seed)}`;
