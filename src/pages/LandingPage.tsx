@@ -440,6 +440,32 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* Android Coming Soon */}
+      <section className="android-banner">
+        <div className="android-banner-inner fade-in">
+          <div className="android-banner-icon">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+            >
+              <path d="M17.523 15.341a.75.75 0 1 0 1.5 0 .75.75 0 0 0-1.5 0ZM4.977 15.341a.75.75 0 1 0 1.5 0 .75.75 0 0 0-1.5 0ZM14.4 3.21l.9-1.56a.375.375 0 0 0-.65-.376l-.912 1.58A6.735 6.735 0 0 0 12 2.625c-.956 0-1.863.194-2.688.535L8.25 1.274a.375.375 0 0 0-.65.376l.9 1.56A6.752 6.752 0 0 0 5.25 9v.375h13.5V9A6.752 6.752 0 0 0 14.4 3.21ZM5.25 11.625v5.625A1.5 1.5 0 0 0 6.75 18.75h10.5a1.5 1.5 0 0 0 1.5-1.5v-5.625H5.25ZM3.375 9.75A.375.375 0 0 0 3 10.125v6.75a1.5 1.5 0 0 0 1.5 1.5.375.375 0 0 0 .375-.375v-8.25zM21 10.125a.375.375 0 0 0-.375-.375H20.25v8.625a.375.375 0 0 0 .375.375 1.5 1.5 0 0 0 1.5-1.5v-6.75A.375.375 0 0 0 21 10.125Z" />
+            </svg>
+          </div>
+          <div className="android-banner-text">
+            <div className="android-banner-label">Coming to Android</div>
+            <h2>TournMate for Android is on its way.</h2>
+            <p>
+              Register now and we'll notify you the moment TournMate lands on
+              Google Play — be the first on the court.
+            </p>
+          </div>
+          <a href="/login" className="android-banner-cta">
+            Register &amp; Get Notified
+          </a>
+        </div>
+      </section>
+
       {/* Download CTA */}
       <section className="cta-section" id="download">
         <div className="cta-content fade-in">
