@@ -1,0 +1,22 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.s2aglobal.tournmate",
+      "sha256_cert_fingerprints": [
+        "9E:CB:2D:99:33:E3:A5:70:17:8E:CF:3C:42:17:71:7B:9C:0C:67:3C:2D:F9:F8:5C:9C:D1:7D:AD:C3:03:7A:DD"
+      ]
+    }
+  },
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.s2aglobal.tournmate.dev",
+      "sha256_cert_fingerprints": [
+        "47:E8:F9:84:FC:94:C6:85:19:29:5E:9D:71:A3:75:65:67:A6:2D:24:5D:53:2A:D6:89:F9:85:09:B3:46:A1:37"
+      ]
+    }
+  }
+]
