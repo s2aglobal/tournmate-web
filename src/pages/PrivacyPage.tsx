@@ -3,8 +3,7 @@ export default function PrivacyPage() {
     <main className="legal-page">
       <h1>Privacy Policy</h1>
       <p className="legal-meta">
-        Effective Date: April 1, 2026 &nbsp;|&nbsp; Last Updated: April 13,
-        2026
+        Effective Date: April 1, 2026 &nbsp;|&nbsp; Last Updated: October 5, 2026
       </p>
 
       <div className="legal-content">
@@ -33,14 +32,24 @@ export default function PrivacyPage() {
             data.
           </li>
           <li>
-            <strong>HealthKit Data:</strong> With your explicit permission, we
-            read workout and active energy data from Apple HealthKit. We do not
-            write to or share your HealthKit data with third parties.
+            <strong>Health Data (Apple Health on iOS):</strong> With your
+            explicit permission, we read workout and active energy data from
+            Apple HealthKit. We do not write to HealthKit.
           </li>
           <li>
-            <strong>Location Data:</strong> When you use the Court Finder
-            feature, we may access your general location to show nearby venues.
-            We do not continuously track your location.
+            <strong>Health Data (Health Connect on Android):</strong> With your
+            explicit permission, we read exercise sessions and active calories
+            burned from Health Connect, only to estimate the calories for a
+            session you choose to log. We do not write to Health Connect. You can
+            revoke access at any time in the Health Connect app.
+          </li>
+          <li>
+            <strong>Location Data:</strong> When you use the Court Finder or sort
+            events by &ldquo;Nearest to me&rdquo;, we may access your device
+            location to find nearby venues and order results by distance. To find
+            nearby courts, your location is sent to Google Maps Platform for that
+            search. We do not continuously track your location or store it on our
+            servers.
           </li>
         </ul>
 
@@ -85,8 +94,10 @@ export default function PrivacyPage() {
           </li>
         </ul>
         <p>
-          We will never share your Apple HealthKit data with third parties or use
-          it for advertising purposes.
+          We will never sell your health data (Apple HealthKit or Health Connect),
+          share it with third parties, or use it for advertising purposes. Our use
+          of information received from Health Connect adheres to the Health
+          Connect Permissions policy, including its Limited Use requirements.
         </p>
 
         <h2>6. Data Retention</h2>
@@ -94,6 +105,24 @@ export default function PrivacyPage() {
           We retain your data only as long as necessary to provide our services
           or comply with legal obligations. If you delete your account, we will
           remove your personal data within a reasonable timeframe.
+        </p>
+
+        <h3 id="delete-account">Deleting your account</h3>
+        <p>
+          You can delete your account at any time in the app: open{" "}
+          <strong>Profile</strong>, scroll down and tap{" "}
+          <strong>Delete Account</strong>. This permanently deletes your login and
+          your player profile.
+        </p>
+        <p>
+          You can also request deletion without the app by emailing{" "}
+          <a href="mailto:contact@s2agloballlc.com?subject=TournMate%20account%20deletion">
+            contact@s2agloballlc.com
+          </a>{" "}
+          from the address you signed up with. We delete your account, profile,
+          calorie records and ratings you gave within 30 days. Tournament and
+          match results you took part in may be kept in anonymized form so other
+          players&apos; brackets and standings stay correct.
         </p>
 
         <h2>7. Your Rights</h2>
@@ -152,7 +181,9 @@ export default function PrivacyPage() {
         <h2>11. Third-Party Services</h2>
         <p>
           The App integrates with third-party services including Firebase
-          (Google), Apple HealthKit, Apple Sign-In, Google Sign-In, and DiceBear.
+          (Google: Authentication, Firestore, Cloud Messaging, Analytics and
+          Crashlytics), Google Maps Platform, Apple HealthKit, Google Health
+          Connect, Apple Sign-In, Google Sign-In, and DiceBear.
           These services have their own privacy policies, and we encourage you to
           review them.
         </p>
