@@ -19,6 +19,13 @@ const SPORT_STORE_PAGES: Record<string, string> = {
   pickleball: "https://apps.apple.com/us/app/tournmate/id6765781689?ppid=47a9c6af-cbae-460f-abd6-7212d6328701",
 };
 
+/** App Store in-app event; the hero link hides itself once the event ends. */
+const STORE_EVENT = {
+  url: "https://apps.apple.com/us/app/id6765781689?eventid=6819148170",
+  label: "New: Pickleball & Tennis are here",
+  endsAt: new Date("2026-11-05T23:59:00-06:00"),
+};
+
 function Phone({ src, alt, large, glow }: { src: string; alt: string; large?: boolean; glow?: boolean }) {
   return (
     <div className={`phone-mockup${large ? " large" : ""}`}>
@@ -97,6 +104,13 @@ export default function LandingPage() {
       <section className="hero">
         <div className="hero-content">
           <div className="hero-text">
+            {Date.now() < STORE_EVENT.endsAt.getTime() && (
+              <a className="hero-event" href={STORE_EVENT.url}>
+                <span className="hero-event-dot" />
+                {STORE_EVENT.label}
+                <span aria-hidden="true">→</span>
+              </a>
+            )}
             <div className="hero-eyebrow">Pickleball · Badminton · Tennis</div>
             <h1>
               The Court
