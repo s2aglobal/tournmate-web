@@ -64,6 +64,7 @@ export default function Navbar() {
         <div className="nav-links">
           {isHome && (
             <>
+              <a href="#sports">Sports</a>
               <a href="#features">Features</a>
               <a href="#how-it-works">How It Works</a>
             </>

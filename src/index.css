@@ -345,6 +345,96 @@ a { text-decoration: none; color: inherit; }
 .footer-social-link svg { width: 18px; height: 18px; flex-shrink: 0; }
 .footer-copy { font-size: 0.8rem; color: var(--gray-500); }
 
+/* ── Store Buttons ─────────────────────────────────── */
+.store-buttons { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+.cta-section .store-buttons { justify-content: center; }
+.store-btn {
+  display: inline-flex; align-items: center; gap: 10px; height: 52px; padding: 0 18px 0 14px;
+  background: #000; color: var(--white); border: 1px solid #A6A6A6; border-radius: 10px;
+  font-size: 1.15rem; font-weight: 600; line-height: 1.05; letter-spacing: -0.01em;
+  transition: transform 0.2s;
+}
+.store-btn:hover { transform: scale(1.05); }
+.store-btn svg { width: 26px; height: 26px; fill: currentColor; flex-shrink: 0; }
+.store-btn span { display: flex; flex-direction: column; text-align: left; }
+.store-btn small { font-size: 0.62rem; font-weight: 500; text-transform: uppercase; letter-spacing: 0.04em; }
+.store-btn.soon { opacity: 0.55; cursor: default; }
+.store-btn.soon:hover { transform: none; }
+
+/* ── Hero Sport Switcher ───────────────────────────── */
+.sport-switcher { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 14px; }
+.sport-chip {
+  --chip: var(--brand-purple);
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 8px 16px 8px 8px; border-radius: 100px; cursor: pointer;
+  background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12);
+  color: var(--gray-400); font: 600 0.9rem var(--font-sans);
+  transition: background 0.25s, color 0.25s, border-color 0.25s, transform 0.2s;
+}
+.sport-chip img { width: 28px; height: 28px; border-radius: 50%; }
+.sport-chip:hover { color: var(--white); transform: translateY(-1px); }
+.sport-chip.active { background: var(--chip); border-color: var(--chip); color: var(--white); }
+.sport-chip:focus-visible { outline: 2px solid var(--lime-accent); outline-offset: 2px; }
+.sport-tagline {
+  min-height: 1.6em; margin-bottom: 32px;
+  font-size: 1rem; font-weight: 700; color: var(--lime-accent); letter-spacing: 0.01em;
+}
+.hero-screens { display: grid; }
+.hero-screens img { grid-area: 1 / 1; opacity: 0; transition: opacity 0.6s ease; }
+.hero-screens img.active { opacity: 1; }
+@media (prefers-reduced-motion: reduce) { .hero-screens img { transition: none; } }
+
+/* ── Sports Catalog ────────────────────────────────── */
+.sports-section { padding: 120px 24px; background: var(--white); }
+.sports-section .section-header { text-align: center; max-width: 640px; margin: 0 auto 56px; }
+.sports-section .section-header h2 {
+  font-size: clamp(2rem, 4vw, 3rem); font-weight: 800; color: var(--dark-navy);
+  letter-spacing: -0.03em; line-height: 1.1; margin-bottom: 16px;
+}
+.sports-section .section-header p { font-size: 1.1rem; color: var(--gray-500); line-height: 1.7; }
+.sports-section .feature-label { color: var(--brand-purple); }
+.sport-categories { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; }
+.sport-category h3 {
+  font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em;
+  color: var(--gray-500); margin-bottom: 14px;
+}
+.sport-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.sport-tile {
+  --tile: var(--brand-purple);
+  position: relative; display: flex; flex-direction: column; align-items: center; justify-content: flex-end;
+  gap: 8px; min-height: 120px; padding: 30px 6px 14px; border-radius: 18px;
+  background: var(--gray-50); border: 1px solid var(--gray-200); text-align: center;
+}
+.sport-tile img { width: 52px; height: 52px; filter: grayscale(0.85); opacity: 0.55; }
+.sport-name { font-size: 0.82rem; font-weight: 600; color: var(--gray-500); line-height: 1.2; }
+.sport-tile.live {
+  background: var(--tile); border-color: var(--tile);
+  box-shadow: 0 10px 28px color-mix(in srgb, var(--tile) 35%, transparent);
+}
+.sport-tile.live img { filter: none; opacity: 1; }
+.sport-tile.live .sport-name { color: var(--white); }
+.sport-badge {
+  position: absolute; top: 8px; right: 8px; padding: 2px 8px; border-radius: 100px;
+  font-size: 0.6rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em;
+  background: var(--gray-200); color: var(--gray-500);
+}
+.sport-badge.live { background: var(--lime-accent); color: var(--dark-navy); }
+.sports-note { text-align: center; margin-top: 40px; font-size: 0.95rem; color: var(--gray-500); }
+
+@media (max-width: 960px) {
+  .sport-categories { grid-template-columns: 1fr; max-width: 520px; margin: 0 auto; }
+  .sport-switcher { justify-content: center; }
+}
+@media (max-width: 600px) {
+  .sports-section { padding: 80px 16px; }
+  .sport-grid { gap: 8px; }
+  .sport-tile { min-height: 104px; padding: 26px 4px 12px; border-radius: 14px; }
+  .sport-tile img { width: 44px; height: 44px; }
+  .sport-name { font-size: 0.75rem; }
+  .store-buttons { justify-content: center; }
+  .store-badge img, .store-btn { height: 46px; }
+}
+
 /* ── Android Coming Soon Banner ────────────────────── */
 .android-banner {
   padding: 80px 24px; background: var(--gray-50);
