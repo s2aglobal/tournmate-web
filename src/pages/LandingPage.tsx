@@ -31,7 +31,7 @@ function Phone({ src, alt, large, glow }: { src: string; alt: string; large?: bo
     <div className={`phone-mockup${large ? " large" : ""}`}>
       {glow && <div className="phone-glow" />}
       <div className="phone-frame">
-        <div className="phone-screen no-notch">
+        <div className="phone-screen">
           <img src={src} alt={alt} loading={large ? "eager" : "lazy"} width={600} height={1304} />
         </div>
       </div>
@@ -154,7 +154,7 @@ export default function LandingPage() {
             <div className="phone-mockup large">
               <div className="phone-glow" />
               <div className="phone-frame">
-                <div className="phone-screen no-notch hero-screens">
+                <div className="phone-screen hero-screens">
                   {liveSports.map((sport) => (
                     <img
                       key={sport}
