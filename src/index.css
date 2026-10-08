@@ -413,6 +413,8 @@ a { text-decoration: none; color: inherit; }
 }
 .sport-tile.live img { filter: none; opacity: 1; }
 .sport-tile.live .sport-name { color: var(--white); }
+.sport-tile.linked { transition: transform 0.2s, box-shadow 0.2s; }
+.sport-tile.linked:hover { transform: translateY(-3px); box-shadow: 0 14px 34px color-mix(in srgb, var(--tile) 45%, transparent); }
 .sport-badge {
   position: absolute; top: 8px; right: 8px; padding: 2px 8px; border-radius: 100px;
   font-size: 0.6rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em;

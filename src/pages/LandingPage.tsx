@@ -11,6 +11,14 @@ const HERO_SCREENS: Record<string, { src: string; tagline: string; color: string
   tennis: { src: `${SHOT}/play-tennis.webp`, tagline: "Serve. Volley. Ace.", color: "#1F7A45" },
 };
 
+/**
+ * App Store custom product pages per sport (App Store Connect → Custom Product
+ * Pages). Sports without one link to the default App Store page.
+ */
+const SPORT_STORE_PAGES: Record<string, string> = {
+  pickleball: "https://apps.apple.com/us/app/tournmate/id6765781689?ppid=47a9c6af-cbae-460f-abd6-7212d6328701",
+};
+
 function Phone({ src, alt, large, glow }: { src: string; alt: string; large?: boolean; glow?: boolean }) {
   return (
     <div className={`phone-mockup${large ? " large" : ""}`}>
@@ -122,7 +130,10 @@ export default function LandingPage() {
               {HERO_SCREENS[activeSport]?.tagline}
             </p>
             <div className="hero-actions">
-              <StoreButtons ios={config.iosStoreURL} android={config.androidStoreURL} />
+              <StoreButtons
+                ios={SPORT_STORE_PAGES[activeSport] ?? config.iosStoreURL}
+                android={config.androidStoreURL}
+              />
             </div>
           </div>
           <div className="hero-phone-wrapper scale-in">
@@ -187,10 +198,14 @@ export default function LandingPage() {
                 <div className="sport-grid">
                   {category.sports.map((sport) => {
                     const live = config.live.includes(sport);
+                    const page = live ? SPORT_STORE_PAGES[sport] : undefined;
+                    const Tile = page ? "a" : "div";
                     return (
-                      <div
+                      <Tile
                         key={sport}
-                        className={`sport-tile${live ? " live" : ""}`}
+                        href={page}
+                        aria-label={page ? `Get TournMate for ${sportName(sport)} on the App Store` : undefined}
+                        className={`sport-tile${live ? " live" : ""}${page ? " linked" : ""}`}
                         style={
                           live && HERO_SCREENS[sport]
                             ? ({ "--tile": HERO_SCREENS[sport].color } as CSSProperties)
@@ -202,7 +217,7 @@ export default function LandingPage() {
                         </span>
                         <img src={sportIcon(sport, 192)} alt="" loading="lazy" />
                         <span className="sport-name">{sportName(sport)}</span>
-                      </div>
+                      </Tile>
                     );
                   })}
                 </div>
