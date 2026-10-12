@@ -69,7 +69,7 @@ export const DEFAULT_SITE_CONFIG: SiteConfig = {
     },
   ],
   iosStoreURL: "https://apps.apple.com/us/app/tournmate/id6765781689",
-  androidStoreURL: null,
+  androidStoreURL: "https://play.google.com/store/apps/details?id=com.s2aglobal.tournmate",
 };
 
 export function sportName(id: string): string {
@@ -122,7 +122,7 @@ export function useSiteConfig(): SiteConfig {
         if (app.status === "fulfilled") {
           const data = app.value.data();
           next.iosStoreURL = nonBlank(data?.iosStoreURL) ?? prev.iosStoreURL;
-          next.androidStoreURL = nonBlank(data?.androidStoreURL);
+          next.androidStoreURL = nonBlank(data?.androidStoreURL) ?? prev.androidStoreURL;
         }
         return next;
       });
