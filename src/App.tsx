@@ -11,6 +11,9 @@ import EmailVerificationPage from "./pages/EmailVerificationPage";
 import ProfileSetupPage from "./pages/ProfileSetupPage";
 import DashboardPage from "./pages/DashboardPage";
 import ProfilePage from "./pages/ProfilePage";
+import TournamentsPage from "./pages/TournamentsPage";
+import TournamentDetailPage from "./pages/TournamentDetailPage";
+import CreateTournamentPage from "./pages/CreateTournamentPage";
 import type { ReactNode } from "react";
 
 function LoadingScreen() {
@@ -107,6 +110,16 @@ function AppRoutes() {
           element={
             <ProfileGate>
               <ProfilePage />
+            </ProfileGate>
+          }
+        />
+        <Route path="/tournaments" element={<TournamentsPage />} />
+        <Route path="/tournaments/:id" element={<TournamentDetailPage />} />
+        <Route
+          path="/tournaments/create"
+          element={
+            <ProfileGate>
+              <CreateTournamentPage />
             </ProfileGate>
           }
         />

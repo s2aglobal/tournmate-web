@@ -70,6 +70,7 @@ export default function Navbar() {
             </>
           )}
           {!isHome && <Link to="/">Home</Link>}
+          <Link to="/tournaments">Tournaments</Link>
 
           {user ? (
             <div className="nav-profile-wrapper" ref={menuRef}>
