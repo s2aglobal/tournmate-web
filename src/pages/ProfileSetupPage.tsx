@@ -8,16 +8,7 @@ import SportPicker from "../components/shared/SportPicker";
 import { APP_AVATARS, DEFAULT_AVATAR_ID, avatarImageUrl } from "../services/avatars";
 
 
-type Step = "profile" | "hand" | "skill" | "success";
-type PlayingHand = "right" | "left";
-type SkillLevel = "beginner" | "intermediate" | "advanced" | "pro";
-
-const SKILL_OPTIONS: { value: SkillLevel; label: string; desc: string }[] = [
-  { value: "beginner", label: "Beginner", desc: "Just getting started" },
-  { value: "intermediate", label: "Intermediate", desc: "Play regularly, know the basics" },
-  { value: "advanced", label: "Advanced", desc: "Competitive player with solid skills" },
-  { value: "pro", label: "Pro", desc: "Tournament-level or professional" },
-];
+type Step = "profile" | "success";
 
 const MINIMUM_AGE = 13;
 
@@ -57,12 +48,6 @@ export default function ProfileSetupPage() {
   // Same choice as the apps' "Your sport" (live sports from config/sports).
   const [preferredSport, setPreferredSport] = useState("");
 
-  // Step 2 — playing hand (UI-only, matches iOS)
-  const [playingHand, setPlayingHand] = useState<PlayingHand>("right");
-
-  // Step 3 — skill level (UI-only, matches iOS)
-  const [skillLevel, setSkillLevel] = useState<SkillLevel>("intermediate");
-
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -94,16 +79,10 @@ export default function ProfileSetupPage() {
       return;
     }
 
-    setStep("hand");
+    void createProfile();
   }
 
-  function handleHandNext() {
-    setStep("skill");
-  }
-
-  async function handleSkillDone() {
-    setError("");
-
+  async function createProfile() {
     if (!user?.email) {
       setError("No email found on your account. Please sign out and try again.");
       return;
@@ -144,8 +123,7 @@ export default function ProfileSetupPage() {
     return (
       <div className="profile-page">
         <div className="profile-card">
-          <div className="step-indicator">Step 1 of 3</div>
-          <h1>Set Up Your Profile</h1>
+                    <h1>Set Up Your Profile</h1>
           <p className="auth-subtitle">Tell us about yourself to get started</p>
 
           {error && <div className="alert error">{error}</div>}
@@ -275,106 +253,10 @@ export default function ProfileSetupPage() {
               </div>
             </div>
 
-            <button type="submit" className="btn-primary">
-              Next
-            </button>
-          </form>
-        </div>
-      </div>
-    );
-  }
-
-  // ── Step 2: Playing Hand ────────────────────────────
-  if (step === "hand") {
-    return (
-      <div className="profile-page">
-        <div className="profile-card">
-          <div className="step-indicator">Step 2 of 3</div>
-          <h1>Playing Hand</h1>
-          <p className="auth-subtitle">Which hand do you play with?</p>
-
-          <div className="choice-grid">
-            <button
-              type="button"
-              className={`choice-card${playingHand === "left" ? " selected" : ""}`}
-              onClick={() => setPlayingHand("left")}
-            >
-              <span className="choice-icon">&#x270B;</span>
-              <span className="choice-label">Left Handed</span>
-            </button>
-            <button
-              type="button"
-              className={`choice-card${playingHand === "right" ? " selected" : ""}`}
-              onClick={() => setPlayingHand("right")}
-            >
-              <span className="choice-icon">&#x1F91A;</span>
-              <span className="choice-label">Right Handed</span>
-            </button>
-          </div>
-
-          <div className="wizard-buttons">
-            <button
-              type="button"
-              className="btn-outline"
-              onClick={() => setStep("profile")}
-            >
-              Back
-            </button>
-            <button
-              type="button"
-              className="btn-primary"
-              onClick={handleHandNext}
-            >
-              Next
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  // ── Step 3: Skill Level ─────────────────────────────
-  if (step === "skill") {
-    return (
-      <div className="profile-page">
-        <div className="profile-card">
-          <div className="step-indicator">Step 3 of 3</div>
-          <h1>Skill Level</h1>
-          <p className="auth-subtitle">How would you rate your ability?</p>
-
-          {error && <div className="alert error">{error}</div>}
-
-          <div className="skill-grid">
-            {SKILL_OPTIONS.map((opt) => (
-              <button
-                key={opt.value}
-                type="button"
-                className={`skill-card${skillLevel === opt.value ? " selected" : ""}`}
-                onClick={() => setSkillLevel(opt.value)}
-              >
-                <span className="skill-label">{opt.label}</span>
-                <span className="skill-desc">{opt.desc}</span>
-              </button>
-            ))}
-          </div>
-
-          <div className="wizard-buttons">
-            <button
-              type="button"
-              className="btn-outline"
-              onClick={() => setStep("hand")}
-            >
-              Back
-            </button>
-            <button
-              type="button"
-              className="btn-primary"
-              onClick={handleSkillDone}
-              disabled={loading}
-            >
+            <button type="submit" className="btn-primary" disabled={loading}>
               {loading ? "Creating Profile..." : "Complete Setup"}
             </button>
-          </div>
+          </form>
         </div>
       </div>
     );
