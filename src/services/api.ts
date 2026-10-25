@@ -55,6 +55,12 @@ export interface CreatePlayerPayload {
   homeCountryCode?: string;
   homePostalCode?: string;
   dateOfBirth?: string;
+  /** Sport id (e.g. "pickleball"); the apps open on this sport. */
+  preferredSport?: string;
+  /** "left" | "right", as the apps store it. */
+  playingHand?: string;
+  /** "beginner" | "intermediate" | "advanced" | "pro", as the apps store it. */
+  skillLevel?: string;
 }
 
 export async function getMyPlayer(
@@ -111,11 +117,18 @@ export async function createPlayer(
     elo: 1200,
     streak: 0,
     firebaseUid,
-    avatarId: data.avatarId ?? "adventurer",
+    avatarId: data.avatarId ?? "shuttlecock",
     homeCountryCode: data.homeCountryCode ?? null,
     homePostalCode: data.homePostalCode ?? null,
     createdAt: Timestamp.now(),
   };
+
+  if (data.playingHand) playerDoc.playingHand = data.playingHand;
+  if (data.skillLevel) playerDoc.skillLevel = data.skillLevel;
+
+  if (data.preferredSport) {
+    playerDoc.preferredSport = data.preferredSport;
+  }
 
   if (data.dateOfBirth) {
     playerDoc.dateOfBirth = Timestamp.fromDate(new Date(data.dateOfBirth));

@@ -2,10 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth";
 import { signOut } from "../../services/auth";
-
-function avatarUrl(seed: string, style: string) {
-  return `https://api.dicebear.com/9.x/${style}/svg?seed=${encodeURIComponent(seed)}`;
-}
+import { avatarImageUrl } from "../../services/avatars";
 
 export default function Navbar() {
   const { user, player } = useAuth();
@@ -44,7 +41,7 @@ export default function Navbar() {
     : user?.email?.[0]?.toUpperCase() ?? "?";
 
   const avatarSrc = player
-    ? avatarUrl(player.name, player.avatarId ?? "adventurer")
+    ? avatarImageUrl(player.avatarId, player.name)
     : null;
 
   async function handleSignOut() {

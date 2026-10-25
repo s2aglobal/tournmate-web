@@ -2,10 +2,7 @@ import { QRCodeSVG } from "qrcode.react";
 import { useAuth } from "../hooks/useAuth";
 import { useSiteConfig } from "../services/siteConfig";
 import StoreButtons from "../components/shared/StoreButtons";
-
-function avatarUrl(seed: string, style: string) {
-  return `https://api.dicebear.com/9.x/${style}/svg?seed=${encodeURIComponent(seed)}`;
-}
+import { avatarImageUrl } from "../services/avatars";
 
 export default function DashboardPage() {
   const { player, user } = useAuth();
@@ -15,7 +12,6 @@ export default function DashboardPage() {
     ...(androidStoreURL ? [{ label: "Android", url: androidStoreURL }] : []),
   ];
   const displayName = player?.name ?? user?.displayName ?? "Player";
-  const avatarStyle = player?.avatarId ?? "adventurer";
   const avatarSeed = player?.name ?? user?.email ?? "player";
 
   return (
@@ -23,7 +19,7 @@ export default function DashboardPage() {
       <div className="dashboard-inner">
         <div className="dashboard-welcome">
           <img
-            src={avatarUrl(avatarSeed, avatarStyle)}
+            src={avatarImageUrl(player?.avatarId, avatarSeed)}
             alt="Your avatar"
             style={{
               width: 80,

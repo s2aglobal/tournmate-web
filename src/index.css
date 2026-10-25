@@ -613,7 +613,7 @@ a { text-decoration: none; color: inherit; }
 .btn-primary:hover:not(:disabled) {
   transform: translateY(-1px); box-shadow: 0 4px 20px rgba(125,56,237,0.3);
 }
-.btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
+.btn-primary:disabled { opacity: 0.45; cursor: not-allowed; }
 
 .btn-outline {
   width: 100%; padding: 12px 24px; border: 1.5px solid var(--gray-200);
@@ -712,6 +712,38 @@ a { text-decoration: none; color: inherit; }
 }
 
 /* ── Avatar Grid ───────────────────────────────────── */
+.sport-picker { display: flex; flex-direction: column; gap: 18px; }
+.sport-picker-title {
+  font-size: 0.72rem; font-weight: 700; letter-spacing: 0.14em;
+  text-transform: uppercase; color: var(--gray-400, #9ca3af); margin-bottom: 8px;
+}
+.sport-picker-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.pick-tile {
+  position: relative; display: flex; flex-direction: column; align-items: flex-start;
+  justify-content: space-between; gap: 18px; min-height: 104px; padding: 14px;
+  border: 1px solid var(--gray-200, #e5e7eb); border-radius: 16px; background: #fff;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06); cursor: pointer; text-align: left;
+  transition: transform 0.15s, box-shadow 0.15s, border-color 0.15s;
+}
+.pick-tile img { width: 40px; height: 40px; }
+.pick-tile-name { font-weight: 700; font-size: 0.95rem; color: var(--dark-navy, #0f172a); line-height: 1.2; }
+.pick-tile:not(.soon):hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(15, 23, 42, 0.1); }
+.pick-tile.selected { border: 2px solid var(--brand-purple); background: rgba(124, 58, 237, 0.06); }
+.pick-tile.soon { cursor: default; background: #f8fafc; box-shadow: none; }
+.pick-tile.soon img, .pick-tile.soon .pick-tile-name { opacity: 0.45; }
+.pick-tile-soon {
+  position: absolute; top: 12px; right: 12px; font-size: 0.65rem; font-weight: 700;
+  letter-spacing: 0.12em; text-transform: uppercase; color: var(--gray-400, #9ca3af);
+}
+.pick-tile-check {
+  position: absolute; top: 10px; right: 10px; width: 22px; height: 22px; border-radius: 50%;
+  background: var(--brand-purple); color: #fff; font-size: 0.75rem; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+}
+@media (max-width: 480px) {
+  .sport-picker-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
 .avatar-grid {
   display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin-bottom: 24px;
 }

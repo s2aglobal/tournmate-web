@@ -4,36 +4,23 @@ import { useAuth } from "../hooks/useAuth";
 import { createPlayer } from "../services/api";
 import { useSiteConfig } from "../services/siteConfig";
 import StoreButtons from "../components/shared/StoreButtons";
+import SportPicker from "../components/shared/SportPicker";
+import { APP_AVATARS, DEFAULT_AVATAR_ID, avatarImageUrl } from "../services/avatars";
 
-const AVATAR_STYLES = [
-  "adventurer",
-  "avataaars",
-  "bottts",
-  "fun-emoji",
-  "lorelei",
-  "micah",
-  "miniavs",
-  "notionists",
-  "open-peeps",
-  "personas",
-];
 
 type Step = "profile" | "hand" | "skill" | "success";
 type PlayingHand = "right" | "left";
 type SkillLevel = "beginner" | "intermediate" | "advanced" | "pro";
 
 const SKILL_OPTIONS: { value: SkillLevel; label: string; desc: string }[] = [
-  { value: "beginner", label: "Beginner", desc: "Just getting started" },
-  { value: "intermediate", label: "Intermediate", desc: "Play regularly, know the basics" },
-  { value: "advanced", label: "Advanced", desc: "Competitive player with solid skills" },
-  { value: "pro", label: "Pro", desc: "Tournament-level or professional" },
+  { value: "beginner", label: "Beginner", desc: "Just starting out, learning the basics." },
+  { value: "intermediate", label: "Intermediate", desc: "Can rally and understand basic tactics." },
+  { value: "advanced", label: "Advanced", desc: "Tournament regular, consistent shots." },
+  { value: "pro", label: "Pro", desc: "National level player or high-rank." },
 ];
 
 const MINIMUM_AGE = 13;
 
-function avatarUrl(seed: string, style: string) {
-  return `https://api.dicebear.com/9.x/${style}/svg?seed=${encodeURIComponent(seed)}`;
-}
 
 function calculateAge(dob: string): number {
   const birth = new Date(dob);
@@ -55,7 +42,7 @@ function maxDateForPicker(): string {
 export default function ProfileSetupPage() {
   const navigate = useNavigate();
   const { user, refreshPlayer } = useAuth();
-  const { iosStoreURL, androidStoreURL } = useSiteConfig();
+  const { iosStoreURL, androidStoreURL, live, categories } = useSiteConfig();
 
   const [step, setStep] = useState<Step>("profile");
 
@@ -64,22 +51,26 @@ export default function ProfileSetupPage() {
   const [phone, setPhone] = useState("");
   const [gender, setGender] = useState<"male" | "female">("male");
   const [dateOfBirth, setDateOfBirth] = useState("");
-  const [selectedAvatar, setSelectedAvatar] = useState(AVATAR_STYLES[0]);
+  const [selectedAvatar, setSelectedAvatar] = useState(DEFAULT_AVATAR_ID);
   const [homeCountryCode, setHomeCountryCode] = useState("US");
   const [homePostalCode, setHomePostalCode] = useState("");
+  // Same choice as the apps' "Your sport" (live sports from config/sports).
+  const [preferredSport, setPreferredSport] = useState("");
 
-  // Step 2 — playing hand (UI-only, matches iOS)
+  // Step 2 — playing hand (saved as playingHand, like the apps)
   const [playingHand, setPlayingHand] = useState<PlayingHand>("right");
 
-  // Step 3 — skill level (UI-only, matches iOS)
+  // Step 3 — skill level (saved as skillLevel, like the apps)
   const [skillLevel, setSkillLevel] = useState<SkillLevel>("intermediate");
 
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const avatarSeed = name || user?.email || "player";
   const age = dateOfBirth ? calculateAge(dateOfBirth) : null;
   const isUnderAge = age !== null && age < MINIMUM_AGE;
+  // Same as the apps: Next stays disabled until every required field is filled.
+  const canContinue =
+    name.trim().length >= 2 && !!dateOfBirth && !isUnderAge && !!preferredSport && homePostalCode.trim() !== "";
 
   function handleProfileNext(e: FormEvent) {
     e.preventDefault();
@@ -95,6 +86,10 @@ export default function ProfileSetupPage() {
     }
     if (isUnderAge) {
       setError(`You must be at least ${MINIMUM_AGE} years old to use TournMate.`);
+      return;
+    }
+    if (!preferredSport) {
+      setError("Choose your sport.");
       return;
     }
     if (!homePostalCode.trim()) {
@@ -128,6 +123,9 @@ export default function ProfileSetupPage() {
         homeCountryCode: homeCountryCode || undefined,
         homePostalCode: homePostalCode.trim() || undefined,
         dateOfBirth,
+        preferredSport,
+        playingHand,
+        skillLevel,
       });
       await refreshPlayer();
       setStep("success");
@@ -220,21 +218,26 @@ export default function ProfileSetupPage() {
             </div>
 
             <div className="form-group">
+              <label>Your Sport</label>
+              <SportPicker categories={categories} live={live} value={preferredSport} onChange={setPreferredSport} />
+              <p style={{ fontSize: "0.8rem", color: "var(--gray-400)", marginTop: 4 }}>
+                The app opens on this sport. You can change it any time.
+              </p>
+            </div>
+
+            <div className="form-group">
               <label>Choose Your Avatar</label>
               <div className="avatar-grid">
-                {AVATAR_STYLES.map((style) => (
+                {APP_AVATARS.map((a) => (
                   <button
-                    key={style}
+                    key={a.id}
                     type="button"
-                    className={`avatar-option${selectedAvatar === style ? " selected" : ""}`}
-                    onClick={() => setSelectedAvatar(style)}
-                    title={style}
+                    className={`avatar-option${selectedAvatar === a.id ? " selected" : ""}`}
+                    onClick={() => setSelectedAvatar(a.id)}
+                    title={a.name}
+                    aria-label={a.name}
                   >
-                    <img
-                      src={avatarUrl(avatarSeed, style)}
-                      alt={style}
-                      loading="lazy"
-                    />
+                    <img src={avatarImageUrl(a.id)} alt="" loading="lazy" />
                   </button>
                 ))}
               </div>
@@ -277,7 +280,7 @@ export default function ProfileSetupPage() {
               </div>
             </div>
 
-            <button type="submit" className="btn-primary">
+            <button type="submit" className="btn-primary" disabled={!canContinue}>
               Next
             </button>
           </form>
@@ -292,8 +295,8 @@ export default function ProfileSetupPage() {
       <div className="profile-page">
         <div className="profile-card">
           <div className="step-indicator">Step 2 of 3</div>
-          <h1>Playing Hand</h1>
-          <p className="auth-subtitle">Which hand do you play with?</p>
+          <h1>Which is your playing hand?</h1>
+          <p className="auth-subtitle">This helps us match you for doubles.</p>
 
           <div className="choice-grid">
             <button
@@ -341,8 +344,8 @@ export default function ProfileSetupPage() {
       <div className="profile-page">
         <div className="profile-card">
           <div className="step-indicator">Step 3 of 3</div>
-          <h1>Skill Level</h1>
-          <p className="auth-subtitle">How would you rate your ability?</p>
+          <h1>What's your skill level?</h1>
+          <p className="auth-subtitle">Be honest! It ensures fair matches.</p>
 
           {error && <div className="alert error">{error}</div>}
 
@@ -374,7 +377,7 @@ export default function ProfileSetupPage() {
               onClick={handleSkillDone}
               disabled={loading}
             >
-              {loading ? "Creating Profile..." : "Complete Setup"}
+              {loading ? "Creating Profile..." : "Create Profile"}
             </button>
           </div>
         </div>
@@ -392,7 +395,7 @@ export default function ProfileSetupPage() {
           Your profile has been created. Welcome to TournMate!
         </p>
         <img
-          src={avatarUrl(avatarSeed, selectedAvatar)}
+          src={avatarImageUrl(selectedAvatar)}
           alt="Your avatar"
           style={{
             width: 100,
