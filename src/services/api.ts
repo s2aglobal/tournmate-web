@@ -57,6 +57,10 @@ export interface CreatePlayerPayload {
   dateOfBirth?: string;
   /** Sport id (e.g. "pickleball"); the apps open on this sport. */
   preferredSport?: string;
+  /** "left" | "right", as the apps store it. */
+  playingHand?: string;
+  /** "beginner" | "intermediate" | "advanced" | "pro", as the apps store it. */
+  skillLevel?: string;
 }
 
 export async function getMyPlayer(
@@ -118,6 +122,9 @@ export async function createPlayer(
     homePostalCode: data.homePostalCode ?? null,
     createdAt: Timestamp.now(),
   };
+
+  if (data.playingHand) playerDoc.playingHand = data.playingHand;
+  if (data.skillLevel) playerDoc.skillLevel = data.skillLevel;
 
   if (data.preferredSport) {
     playerDoc.preferredSport = data.preferredSport;
