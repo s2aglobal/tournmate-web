@@ -1,7 +1,7 @@
 import { QRCodeSVG } from "qrcode.react";
 import { useAuth } from "../hooks/useAuth";
-
-const APP_STORE_URL = "https://apps.apple.com/us/app/tournmate/id6765781689";
+import { useSiteConfig } from "../services/siteConfig";
+import StoreButtons from "../components/shared/StoreButtons";
 
 function avatarUrl(seed: string, style: string) {
   return `https://api.dicebear.com/9.x/${style}/svg?seed=${encodeURIComponent(seed)}`;
@@ -9,6 +9,11 @@ function avatarUrl(seed: string, style: string) {
 
 export default function DashboardPage() {
   const { player, user } = useAuth();
+  const { iosStoreURL, androidStoreURL } = useSiteConfig();
+  const qrCodes = [
+    { label: "iPhone", url: iosStoreURL },
+    ...(androidStoreURL ? [{ label: "Android", url: androidStoreURL }] : []),
+  ];
   const displayName = player?.name ?? user?.displayName ?? "Player";
   const avatarStyle = player?.avatarId ?? "adventurer";
   const avatarSeed = player?.name ?? user?.email ?? "player";
@@ -95,28 +100,29 @@ export default function DashboardPage() {
         <div className="qr-card">
           <h2>Get the Full Experience</h2>
           <p>
-            Scan the QR code with your phone to download TournMate on the App
-            Store. The mobile app gives you access to all features including live
-            brackets, court finder, calorie tracking, and more.
+            Scan a QR code with your phone to download TournMate on the{" "}
+            {androidStoreURL ? "App Store or Google Play" : "App Store"}. The
+            mobile app gives you access to all features including live brackets,
+            court finder, calorie tracking, and more.
           </p>
-          <div className="qr-wrapper">
-            <QRCodeSVG
-              value={APP_STORE_URL}
-              size={180}
-              bgColor="#ffffff"
-              fgColor="#0F172A"
-              level="M"
-              includeMargin={false}
-            />
+          <div className="qr-grid">
+            {qrCodes.map(({ label, url }) => (
+              <div className="qr-item" key={label}>
+                <div className="qr-wrapper">
+                  <QRCodeSVG
+                    value={url}
+                    size={160}
+                    bgColor="#ffffff"
+                    fgColor="#0F172A"
+                    level="M"
+                    includeMargin={false}
+                  />
+                </div>
+                <span className="qr-label">{label}</span>
+              </div>
+            ))}
           </div>
-          <div>
-            <a href={APP_STORE_URL} className="store-badge">
-              <img
-                src="/assets/app-store-badge.svg"
-                alt="Download on the App Store"
-              />
-            </a>
-          </div>
+          <StoreButtons ios={iosStoreURL} android={androidStoreURL} />
         </div>
       </div>
     </div>

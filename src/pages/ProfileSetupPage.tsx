@@ -2,6 +2,8 @@ import { useState, type FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import { createPlayer } from "../services/api";
+import { useSiteConfig } from "../services/siteConfig";
+import StoreButtons from "../components/shared/StoreButtons";
 
 const AVATAR_STYLES = [
   "adventurer",
@@ -53,6 +55,7 @@ function maxDateForPicker(): string {
 export default function ProfileSetupPage() {
   const navigate = useNavigate();
   const { user, refreshPlayer } = useAuth();
+  const { iosStoreURL, androidStoreURL } = useSiteConfig();
 
   const [step, setStep] = useState<Step>("profile");
 
@@ -402,10 +405,14 @@ export default function ProfileSetupPage() {
         <p style={{ fontWeight: 700, fontSize: "1.2rem", color: "var(--dark-navy)" }}>
           {name}
         </p>
+        <p className="auth-subtitle" style={{ marginTop: 24, marginBottom: 16 }}>
+          Get the app to join tournaments and open play.
+        </p>
+        <StoreButtons ios={iosStoreURL} android={androidStoreURL} />
         <button
           type="button"
           className="btn-primary"
-          style={{ marginTop: 32 }}
+          style={{ marginTop: 24 }}
           onClick={goToDashboard}
         >
           Go to Dashboard
