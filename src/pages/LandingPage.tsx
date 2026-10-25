@@ -1,6 +1,7 @@
 import { useEffect, useState, type CSSProperties } from "react";
 import { useScrollReveal } from "../hooks/useScrollReveal";
 import { sportIcon, sportName, useSiteConfig } from "../services/siteConfig";
+import StoreButtons from "../components/shared/StoreButtons";
 
 const SHOT = "/assets/screenshots/v2";
 
@@ -35,45 +36,6 @@ function Phone({ src, alt, large, glow }: { src: string; alt: string; large?: bo
           <img src={src} alt={alt} loading={large ? "eager" : "lazy"} width={600} height={1304} />
         </div>
       </div>
-    </div>
-  );
-}
-
-function GooglePlayButton({ url }: { url: string | null }) {
-  const icon = (
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M4.2 2.4c-.3.3-.4.7-.4 1.2v16.8c0 .5.1.9.4 1.2l9.3-9.6-9.3-9.6Zm10.6 10.9 2.6 2.7-11.2 6.4c-.4.2-.8.3-1.2.2l9.8-9.3Zm0-2.6L5 1.4c.4-.1.8 0 1.2.2L17.4 8l-2.6 2.7Zm3.9.3L20.6 12c.8.5.8 1.6 0 2.1l-2 1.1-2.8-2.9 2.9-1.3Z" />
-    </svg>
-  );
-  if (!url) {
-    return (
-      <span className="store-btn soon" aria-label="Coming soon to Google Play">
-        {icon}
-        <span>
-          <small>Coming soon to</small>
-          Google Play
-        </span>
-      </span>
-    );
-  }
-  return (
-    <a className="store-btn" href={url} aria-label="Get it on Google Play">
-      {icon}
-      <span>
-        <small>Get it on</small>
-        Google Play
-      </span>
-    </a>
-  );
-}
-
-function StoreButtons({ ios, android }: { ios: string; android: string | null }) {
-  return (
-    <div className="store-buttons">
-      <a href={ios} className="store-badge">
-        <img src="/assets/app-store-badge.svg" alt="Download on the App Store" />
-      </a>
-      <GooglePlayButton url={android} />
     </div>
   );
 }
@@ -285,10 +247,51 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Find your next game */}
-      <section className="feature-section light">
+      {/* Draw generation */}
+      <section className="feature-section light" id="draws">
         <div className="feature-inner reversed">
           <div className="feature-text fade-in-right">
+            <div className="feature-label red">Draw Generation</div>
+            <h2>
+              Brackets,
+              <br />
+              Built for You.
+            </h2>
+            <p>
+              When registration closes, generate the whole draw in one tap:
+              groups, seeds and the knockout bracket, ready to share before the
+              first serve.
+            </p>
+            <ul className="feature-list">
+              <li>
+                <span className="icon">&#x1F3B2;</span> One tap draws groups and
+                brackets from your registered teams
+              </li>
+              <li>
+                <span className="icon">&#x1F3C5;</span> Elo-based seeding keeps
+                top players apart until the late rounds
+              </li>
+              <li>
+                <span className="icon">&#x1F3C6;</span> Group winners advance into
+                the knockout bracket automatically
+              </li>
+              <li>
+                <span className="icon">&#x270D;&#xFE0F;</span> Prefer your own
+                draw? Place teams manually instead
+              </li>
+            </ul>
+          </div>
+          <div className="feature-phones fade-in-left">
+            <Phone src={`${SHOT}/draw-groups.webp`} alt="Group stage draw with teams in Group A and Group B" />
+            <Phone src={`${SHOT}/draw-knockout.webp`} alt="Knockout bracket with semi finals and final" />
+          </div>
+        </div>
+      </section>
+
+      {/* Find your next game */}
+      <section className="feature-section subtle">
+        <div className="feature-inner">
+          <div className="feature-text fade-in-left">
             <div className="feature-label green">Open Play</div>
             <h2>
               Find Your
@@ -318,7 +321,7 @@ export default function LandingPage() {
               </li>
             </ul>
           </div>
-          <div className="feature-phones fade-in-left">
+          <div className="feature-phones fade-in-right">
             <Phone src={`${SHOT}/open-play.webp`} alt="Pickleball open play sessions" />
             <Phone src={`${SHOT}/sort-filter.webp`} alt="Sort and filter tournaments" />
           </div>
@@ -326,9 +329,9 @@ export default function LandingPage() {
       </section>
 
       {/* Court Finder */}
-      <section className="feature-section subtle">
-        <div className="feature-inner">
-          <div className="feature-text fade-in-left">
+      <section className="feature-section light">
+        <div className="feature-inner reversed">
+          <div className="feature-text fade-in-right">
             <div className="feature-label orange">Court Finder</div>
             <h2>
               Discover Courts
@@ -354,7 +357,7 @@ export default function LandingPage() {
               </li>
             </ul>
           </div>
-          <div className="feature-phones fade-in-right">
+          <div className="feature-phones fade-in-left">
             <Phone src={`${SHOT}/courts-pickleball.webp`} alt="Find pickleball courts" />
             <Phone src={`${SHOT}/courts-tennis.webp`} alt="Find tennis courts" />
           </div>
@@ -363,8 +366,8 @@ export default function LandingPage() {
 
       {/* Profile, rating & calories */}
       <section className="feature-section dark">
-        <div className="feature-inner reversed">
-          <div className="feature-text fade-in-right">
+        <div className="feature-inner">
+          <div className="feature-text fade-in-left">
             <div className="feature-label blue">Your Game</div>
             <h2>
               Track Your
@@ -394,7 +397,7 @@ export default function LandingPage() {
               </li>
             </ul>
           </div>
-          <div className="feature-phones fade-in-left">
+          <div className="feature-phones fade-in-right">
             <Phone src={`${SHOT}/profile.webp`} alt="Player profile" />
             <Phone src={`${SHOT}/sport-picker.webp`} alt="Sport picker with 16 sports" />
           </div>
