@@ -613,7 +613,7 @@ a { text-decoration: none; color: inherit; }
 .btn-primary:hover:not(:disabled) {
   transform: translateY(-1px); box-shadow: 0 4px 20px rgba(125,56,237,0.3);
 }
-.btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
+.btn-primary:disabled { opacity: 0.45; cursor: not-allowed; }
 
 .btn-outline {
   width: 100%; padding: 12px 24px; border: 1.5px solid var(--gray-200);

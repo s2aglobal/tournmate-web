@@ -53,6 +53,9 @@ export default function ProfileSetupPage() {
 
   const age = dateOfBirth ? calculateAge(dateOfBirth) : null;
   const isUnderAge = age !== null && age < MINIMUM_AGE;
+  // Same as the apps: the button stays disabled until every required field is filled.
+  const canSubmit =
+    name.trim().length >= 2 && !!dateOfBirth && !isUnderAge && !!preferredSport && homePostalCode.trim() !== "";
 
   function handleProfileNext(e: FormEvent) {
     e.preventDefault();
@@ -253,7 +256,7 @@ export default function ProfileSetupPage() {
               </div>
             </div>
 
-            <button type="submit" className="btn-primary" disabled={loading}>
+            <button type="submit" className="btn-primary" disabled={loading || !canSubmit}>
               {loading ? "Creating Profile..." : "Complete Setup"}
             </button>
           </form>
