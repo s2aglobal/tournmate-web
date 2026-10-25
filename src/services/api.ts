@@ -55,6 +55,8 @@ export interface CreatePlayerPayload {
   homeCountryCode?: string;
   homePostalCode?: string;
   dateOfBirth?: string;
+  /** Sport id (e.g. "pickleball"); the apps open on this sport. */
+  preferredSport?: string;
 }
 
 export async function getMyPlayer(
@@ -116,6 +118,10 @@ export async function createPlayer(
     homePostalCode: data.homePostalCode ?? null,
     createdAt: Timestamp.now(),
   };
+
+  if (data.preferredSport) {
+    playerDoc.preferredSport = data.preferredSport;
+  }
 
   if (data.dateOfBirth) {
     playerDoc.dateOfBirth = Timestamp.fromDate(new Date(data.dateOfBirth));

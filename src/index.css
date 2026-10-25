@@ -712,6 +712,27 @@ a { text-decoration: none; color: inherit; }
 }
 
 /* ── Avatar Grid ───────────────────────────────────── */
+.sport-choice-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 10px;
+}
+.sport-choice {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border: 2px solid var(--gray-200, #e5e7eb);
+  border-radius: 14px;
+  background: #fff;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color 0.15s, transform 0.15s;
+}
+.sport-choice img { width: 32px; height: 32px; }
+.sport-choice:hover { transform: translateY(-1px); }
+.sport-choice.selected { border-color: var(--brand-purple); background: rgba(124, 58, 237, 0.06); }
+
 .avatar-grid {
   display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin-bottom: 24px;
 }

@@ -2,7 +2,7 @@ import { useState, type FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import { createPlayer } from "../services/api";
-import { useSiteConfig } from "../services/siteConfig";
+import { sportIcon, sportName, useSiteConfig } from "../services/siteConfig";
 import StoreButtons from "../components/shared/StoreButtons";
 
 const AVATAR_STYLES = [
@@ -55,7 +55,7 @@ function maxDateForPicker(): string {
 export default function ProfileSetupPage() {
   const navigate = useNavigate();
   const { user, refreshPlayer } = useAuth();
-  const { iosStoreURL, androidStoreURL } = useSiteConfig();
+  const { iosStoreURL, androidStoreURL, live } = useSiteConfig();
 
   const [step, setStep] = useState<Step>("profile");
 
@@ -67,6 +67,8 @@ export default function ProfileSetupPage() {
   const [selectedAvatar, setSelectedAvatar] = useState(AVATAR_STYLES[0]);
   const [homeCountryCode, setHomeCountryCode] = useState("US");
   const [homePostalCode, setHomePostalCode] = useState("");
+  // Same choice as the apps' "Your sport" (live sports from config/sports).
+  const [preferredSport, setPreferredSport] = useState("");
 
   // Step 2 — playing hand (UI-only, matches iOS)
   const [playingHand, setPlayingHand] = useState<PlayingHand>("right");
@@ -95,6 +97,10 @@ export default function ProfileSetupPage() {
     }
     if (isUnderAge) {
       setError(`You must be at least ${MINIMUM_AGE} years old to use TournMate.`);
+      return;
+    }
+    if (!preferredSport) {
+      setError("Choose your sport.");
       return;
     }
     if (!homePostalCode.trim()) {
@@ -128,6 +134,7 @@ export default function ProfileSetupPage() {
         homeCountryCode: homeCountryCode || undefined,
         homePostalCode: homePostalCode.trim() || undefined,
         dateOfBirth,
+        preferredSport,
       });
       await refreshPlayer();
       setStep("success");
@@ -217,6 +224,28 @@ export default function ProfileSetupPage() {
                 <option value="male">Male</option>
                 <option value="female">Female</option>
               </select>
+            </div>
+
+            <div className="form-group">
+              <label>Your Sport</label>
+              <div className="sport-choice-grid" role="radiogroup" aria-label="Your sport">
+                {live.map((id) => (
+                  <button
+                    key={id}
+                    type="button"
+                    role="radio"
+                    aria-checked={preferredSport === id}
+                    className={`sport-choice${preferredSport === id ? " selected" : ""}`}
+                    onClick={() => setPreferredSport(id)}
+                  >
+                    <img src={sportIcon(id, 96)} alt="" />
+                    <span>{sportName(id)}</span>
+                  </button>
+                ))}
+              </div>
+              <p style={{ fontSize: "0.8rem", color: "var(--gray-400)", marginTop: 4 }}>
+                The app opens on this sport. You can change it any time.
+              </p>
             </div>
 
             <div className="form-group">
