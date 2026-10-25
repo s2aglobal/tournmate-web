@@ -712,26 +712,37 @@ a { text-decoration: none; color: inherit; }
 }
 
 /* ── Avatar Grid ───────────────────────────────────── */
-.sport-choice-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-  gap: 10px;
+.sport-picker { display: flex; flex-direction: column; gap: 18px; }
+.sport-picker-title {
+  font-size: 0.72rem; font-weight: 700; letter-spacing: 0.14em;
+  text-transform: uppercase; color: var(--gray-400, #9ca3af); margin-bottom: 8px;
 }
-.sport-choice {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 10px 12px;
-  border: 2px solid var(--gray-200, #e5e7eb);
-  border-radius: 14px;
-  background: #fff;
-  font-weight: 600;
-  cursor: pointer;
-  transition: border-color 0.15s, transform 0.15s;
+.sport-picker-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.sport-tile {
+  position: relative; display: flex; flex-direction: column; align-items: flex-start;
+  justify-content: space-between; gap: 18px; min-height: 104px; padding: 14px;
+  border: 1px solid var(--gray-200, #e5e7eb); border-radius: 16px; background: #fff;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06); cursor: pointer; text-align: left;
+  transition: transform 0.15s, box-shadow 0.15s, border-color 0.15s;
 }
-.sport-choice img { width: 32px; height: 32px; }
-.sport-choice:hover { transform: translateY(-1px); }
-.sport-choice.selected { border-color: var(--brand-purple); background: rgba(124, 58, 237, 0.06); }
+.sport-tile img { width: 40px; height: 40px; }
+.sport-tile-name { font-weight: 700; font-size: 0.95rem; color: var(--dark-navy, #0f172a); line-height: 1.2; }
+.sport-tile:not(.soon):hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(15, 23, 42, 0.1); }
+.sport-tile.selected { border: 2px solid var(--brand-purple); background: rgba(124, 58, 237, 0.06); }
+.sport-tile.soon { cursor: default; background: #f8fafc; box-shadow: none; }
+.sport-tile.soon img, .sport-tile.soon .sport-tile-name { opacity: 0.45; }
+.sport-tile-soon {
+  position: absolute; top: 12px; right: 12px; font-size: 0.65rem; font-weight: 700;
+  letter-spacing: 0.12em; text-transform: uppercase; color: var(--gray-400, #9ca3af);
+}
+.sport-tile-check {
+  position: absolute; top: 10px; right: 10px; width: 22px; height: 22px; border-radius: 50%;
+  background: var(--brand-purple); color: #fff; font-size: 0.75rem; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+}
+@media (max-width: 480px) {
+  .sport-picker-grid { grid-template-columns: repeat(2, 1fr); }
+}
 
 .avatar-grid {
   display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin-bottom: 24px;

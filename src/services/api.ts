@@ -113,7 +113,7 @@ export async function createPlayer(
     elo: 1200,
     streak: 0,
     firebaseUid,
-    avatarId: data.avatarId ?? "adventurer",
+    avatarId: data.avatarId ?? "shuttlecock",
     homeCountryCode: data.homeCountryCode ?? null,
     homePostalCode: data.homePostalCode ?? null,
     createdAt: Timestamp.now(),

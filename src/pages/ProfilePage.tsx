@@ -10,15 +10,8 @@ import {
   type SportsmanshipData,
   type FitnessData,
 } from "../services/api";
+import { APP_AVATARS, DEFAULT_AVATAR_ID, avatarImageUrl } from "../services/avatars";
 
-const AVATAR_STYLES = [
-  "adventurer", "avataaars", "bottts", "fun-emoji", "lorelei",
-  "micah", "miniavs", "notionists", "open-peeps", "personas",
-];
-
-function avatarUrl(seed: string, style: string) {
-  return `https://api.dicebear.com/9.x/${style}/svg?seed=${encodeURIComponent(seed)}`;
-}
 
 function tierForElo(elo: number): { name: string; color: string; next: number | null } {
   if (elo >= 2200) return { name: "Grandmaster", color: "#EF4444", next: null };
@@ -64,7 +57,7 @@ export default function ProfilePage() {
   const { player, user, refreshPlayer } = useAuth();
 
   const [editingAvatar, setEditingAvatar] = useState(false);
-  const [selectedAvatar, setSelectedAvatar] = useState(player?.avatarId ?? "adventurer");
+  const [selectedAvatar, setSelectedAvatar] = useState(player?.avatarId ?? DEFAULT_AVATAR_ID);
   const [editingRegion, setEditingRegion] = useState(false);
   const [homeCountryCode, setHomeCountryCode] = useState(player?.homeCountryCode ?? "US");
   const [homePostalCode, setHomePostalCode] = useState(player?.homePostalCode ?? "");
@@ -141,7 +134,7 @@ export default function ProfilePage() {
         <div className="profile-section">
           <div className="profile-header-card">
             <div className="profile-avatar-wrapper">
-              <img src={avatarUrl(avatarSeed, player.avatarId ?? "adventurer")} alt="Avatar" className="profile-lg-avatar" />
+              <img src={avatarImageUrl(player.avatarId, avatarSeed)} alt="Avatar" className="profile-lg-avatar" />
               <button className="profile-avatar-edit" onClick={() => { setEditingAvatar(true); setMessage(""); }} title="Change avatar">
                 &#x270F;&#xFE0F;
               </button>
@@ -157,9 +150,9 @@ export default function ProfilePage() {
             <div className="profile-edit-card">
               <h3>Choose Avatar</h3>
               <div className="avatar-grid">
-                {AVATAR_STYLES.map((style) => (
-                  <button key={style} type="button" className={`avatar-option${selectedAvatar === style ? " selected" : ""}`} onClick={() => setSelectedAvatar(style)}>
-                    <img src={avatarUrl(avatarSeed, style)} alt={style} loading="lazy" />
+                {APP_AVATARS.map((a) => (
+                  <button key={a.id} type="button" title={a.name} aria-label={a.name} className={`avatar-option${selectedAvatar === a.id ? " selected" : ""}`} onClick={() => setSelectedAvatar(a.id)}>
+                    <img src={avatarImageUrl(a.id)} alt="" loading="lazy" />
                   </button>
                 ))}
               </div>
