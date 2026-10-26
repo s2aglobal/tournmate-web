@@ -141,7 +141,9 @@ export default function ProfilePage() {
             </div>
             <h2 className="profile-name">{player.name}</h2>
             <div className="profile-badges">
-              <span className="profile-badge">{player.genderRaw === "female" ? "Female" : "Male"}</span>
+              {(player.genderRaw === "male" || player.genderRaw === "female") && (
+                <span className="profile-badge">{player.genderRaw === "female" ? "Female" : "Male"}</span>
+              )}
               <span className="profile-badge" style={{ background: tier.color, color: "white" }}>{tier.name}</span>
             </div>
           </div>
