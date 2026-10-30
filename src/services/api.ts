@@ -143,7 +143,6 @@ export interface UpdatePlayerPayload {
   name?: string;
   phone?: string;
   avatarId?: string;
-  genderRaw?: string;
   homeCountryCode?: string;
   homePostalCode?: string;
   weightKg?: number;
@@ -170,7 +169,6 @@ export async function updatePlayer(
   if (data.name !== undefined) updates.name = data.name.trim();
   if (data.phone !== undefined) updates.phone = data.phone.trim();
   if (data.avatarId !== undefined) updates.avatarId = data.avatarId;
-  if (data.genderRaw !== undefined) updates.genderRaw = data.genderRaw;
   if (data.homeCountryCode !== undefined) updates.homeCountryCode = data.homeCountryCode;
   if (data.homePostalCode !== undefined) updates.homePostalCode = data.homePostalCode;
   if (data.weightKg !== undefined) updates.weightKg = data.weightKg;
