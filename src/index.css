@@ -851,6 +851,9 @@ a { text-decoration: none; color: inherit; }
 .profile-edit-card h3 {
   font-size: 1rem; font-weight: 700; color: var(--dark-navy); margin-bottom: 16px;
 }
+.photo-actions { display: flex; gap: 12px; margin-bottom: 16px; }
+.btn-outline:disabled { opacity: 0.45; cursor: not-allowed; }
+.photo-status { font-size: 0.85rem; color: var(--gray-500); margin: -4px 0 16px; }
 .profile-card-section {
   background: var(--white); border-radius: 20px; padding: 24px 28px;
   box-shadow: 0 4px 24px rgba(0,0,0,0.06);

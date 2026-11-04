@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type ChangeEvent, type FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import { createPlayer } from "../services/api";
@@ -6,6 +6,9 @@ import { useSiteConfig } from "../services/siteConfig";
 import StoreButtons from "../components/shared/StoreButtons";
 import SportPicker from "../components/shared/SportPicker";
 import { APP_AVATARS, DEFAULT_AVATAR_ID, avatarImageUrl } from "../services/avatars";
+import { callableErrorMessage } from "../services/functions";
+import { uploadProfilePhoto } from "../services/profilePhotos";
+import PlayerAvatar from "../components/shared/PlayerAvatar";
 
 
 type Step = "profile" | "hand" | "skill" | "success";
@@ -52,6 +55,13 @@ export default function ProfileSetupPage() {
   const [gender, setGender] = useState<"male" | "female">("male");
   const [dateOfBirth, setDateOfBirth] = useState("");
   const [selectedAvatar, setSelectedAvatar] = useState(DEFAULT_AVATAR_ID);
+  // Optional photo; uploaded only after the player doc is created.
+  const photoInputRef = useRef<HTMLInputElement>(null);
+  const [photoFile, setPhotoFile] = useState<File | null>(null);
+  const [photoPreview, setPhotoPreview] = useState<string | null>(null);
+  const [photoStatus, setPhotoStatus] = useState("");
+  const [photoError, setPhotoError] = useState("");
+  const [photoURL, setPhotoURL] = useState<string | null>(null);
   const [homeCountryCode, setHomeCountryCode] = useState("US");
   const [homePostalCode, setHomePostalCode] = useState("");
   // Same choice as the apps' "Your sport" (live sports from config/sports).
@@ -65,6 +75,19 @@ export default function ProfileSetupPage() {
 
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (!photoFile) { setPhotoPreview(null); return; }
+    const url = URL.createObjectURL(photoFile);
+    setPhotoPreview(url);
+    return () => URL.revokeObjectURL(url);
+  }, [photoFile]);
+
+  function handlePhotoPicked(e: ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (file) setPhotoFile(file);
+  }
 
   const age = dateOfBirth ? calculateAge(dateOfBirth) : null;
   const isUnderAge = age !== null && age < MINIMUM_AGE;
@@ -127,6 +150,19 @@ export default function ProfileSetupPage() {
         playingHand,
         skillLevel,
       });
+      if (photoFile) {
+        // The profile exists now; a failed photo doesn't undo it.
+        setPhotoStatus("Uploading photo... 0%");
+        try {
+          setPhotoURL(await uploadProfilePhoto(user.uid, photoFile, (f) => {
+            setPhotoStatus(f < 1 ? `Uploading photo... ${Math.round(f * 100)}%` : "Checking photo...");
+          }));
+        } catch (err) {
+          setPhotoError(callableErrorMessage(err, "Couldn't upload your photo. You can add one later from your profile."));
+        } finally {
+          setPhotoStatus("");
+        }
+      }
       await refreshPlayer();
       setStep("success");
     } catch (err: unknown) {
@@ -223,6 +259,27 @@ export default function ProfileSetupPage() {
               <p style={{ fontSize: "0.8rem", color: "var(--gray-400)", marginTop: 4 }}>
                 The app opens on this sport. You can change it any time.
               </p>
+            </div>
+
+            <div className="form-group">
+              <label>Profile Photo (optional)</label>
+              <div className="photo-actions" style={{ alignItems: "center" }}>
+                {photoPreview && (
+                  <img src={photoPreview} alt="Your photo" style={{ width: 56, height: 56, borderRadius: "50%", objectFit: "cover", flexShrink: 0 }} />
+                )}
+                <input ref={photoInputRef} type="file" accept="image/*" hidden onChange={handlePhotoPicked} />
+                <button type="button" className="btn-outline" onClick={() => photoInputRef.current?.click()}>
+                  {photoFile ? "Change Photo" : "Upload Photo"}
+                </button>
+                {photoFile && (
+                  <button type="button" className="btn-outline" onClick={() => setPhotoFile(null)}>
+                    Remove Photo
+                  </button>
+                )}
+              </div>
+              {photoFile && (
+                <p className="photo-status">Your photo shows instead of your avatar. The avatar is used if you remove it.</p>
+              )}
             </div>
 
             <div className="form-group">
@@ -377,7 +434,7 @@ export default function ProfileSetupPage() {
               onClick={handleSkillDone}
               disabled={loading}
             >
-              {loading ? "Creating Profile..." : "Create Profile"}
+              {loading ? photoStatus || "Creating Profile..." : "Create Profile"}
             </button>
           </div>
         </div>
@@ -394,8 +451,10 @@ export default function ProfileSetupPage() {
         <p className="auth-subtitle">
           Your profile has been created. Welcome to TournMate!
         </p>
-        <img
-          src={avatarImageUrl(selectedAvatar)}
+        {photoError && <div className="alert error" style={{ marginTop: 16 }}>{photoError}</div>}
+        <PlayerAvatar
+          photoURL={photoURL}
+          avatarId={selectedAvatar}
           alt="Your avatar"
           style={{
             width: 100,

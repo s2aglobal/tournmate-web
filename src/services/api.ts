@@ -23,6 +23,8 @@ export interface PlayerProfile {
   elo: number;
   streak: number;
   avatarId: string;
+  /** Uploaded profile photo (server-written only). Missing/null/empty = none. */
+  photoURL?: string | null;
   homeCountryCode?: string;
   homePostalCode?: string;
   dateOfBirth?: Timestamp;
@@ -139,6 +141,11 @@ export async function createPlayer(
   return { id, ...playerDoc } as unknown as PlayerProfile;
 }
 
+/**
+ * Profile basics only. Photo fields (`photoURL`, `photoPath`,
+ * `photoUpdatedAt`) are server-written via `setProfilePhoto` /
+ * `removeProfilePhoto` and must never be added here.
+ */
 export interface UpdatePlayerPayload {
   name?: string;
   phone?: string;

@@ -2,7 +2,7 @@ import { QRCodeSVG } from "qrcode.react";
 import { useAuth } from "../hooks/useAuth";
 import { useSiteConfig } from "../services/siteConfig";
 import StoreButtons from "../components/shared/StoreButtons";
-import { avatarImageUrl } from "../services/avatars";
+import PlayerAvatar from "../components/shared/PlayerAvatar";
 
 export default function DashboardPage() {
   const { player, user } = useAuth();
@@ -18,8 +18,10 @@ export default function DashboardPage() {
     <div className="dashboard-page">
       <div className="dashboard-inner">
         <div className="dashboard-welcome">
-          <img
-            src={avatarImageUrl(player?.avatarId, avatarSeed)}
+          <PlayerAvatar
+            photoURL={player?.photoURL}
+            avatarId={player?.avatarId}
+            nameSeed={avatarSeed}
             alt="Your avatar"
             style={{
               width: 80,
