@@ -19,8 +19,12 @@ export async function removeProfilePhoto(): Promise<{ status: string }> {
   return (await fn({})).data;
 }
 
-/** The server's user-facing HttpsError message, or `fallback`. */
+/**
+ * The server's user-facing HttpsError message, a PhotoUploadError's message
+ * (see profilePhotos.ts), or `fallback`.
+ */
 export function callableErrorMessage(err: unknown, fallback: string): string {
+  if (err instanceof Error && err.name === "PhotoUploadError") return err.message;
   if (err instanceof FunctionsError && err.message && err.code !== "functions/internal") {
     return err.message;
   }
