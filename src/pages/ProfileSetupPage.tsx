@@ -342,11 +342,6 @@ export default function ProfileSetupPage() {
                   onCancel={() => setChoosingAvatar(false)}
                 />
               )}
-              {!hasPicture && (
-                <p style={{ fontSize: "0.8rem", color: "var(--gray-400)", marginTop: 6 }}>
-                  Add a photo or choose an avatar to continue.
-                </p>
-              )}
             </div>
 
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
