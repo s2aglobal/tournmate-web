@@ -77,7 +77,9 @@ export async function reloadCurrentUser(): Promise<User | null> {
  * Production enforces verification; dev skips it for testing convenience.
  */
 export function isVerificationRequired(): boolean {
-  return import.meta.env.PROD;
+  // MODE, not PROD: PROD is true for every `vite build`, including
+  // `--mode development` (the dev site).
+  return import.meta.env.MODE === "production";
 }
 
 /**
