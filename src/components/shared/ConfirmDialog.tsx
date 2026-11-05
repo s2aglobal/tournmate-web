@@ -14,10 +14,13 @@ interface Props {
 export default function ConfirmDialog({ title, message, confirmLabel, cancelLabel = "Cancel", busy, onConfirm, onCancel }: Props) {
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
-      if (e.key === "Escape" && !busy) onCancel();
+      if (e.key !== "Escape") return;
+      // Capture + stop so an editor underneath doesn't also close.
+      e.stopPropagation();
+      if (!busy) onCancel();
     }
-    document.addEventListener("keydown", onKey);
-    return () => document.removeEventListener("keydown", onKey);
+    document.addEventListener("keydown", onKey, true);
+    return () => document.removeEventListener("keydown", onKey, true);
   }, [busy, onCancel]);
 
   return (

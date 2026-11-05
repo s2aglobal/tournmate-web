@@ -5,10 +5,12 @@ import { createPlayer } from "../services/api";
 import { useSiteConfig } from "../services/siteConfig";
 import StoreButtons from "../components/shared/StoreButtons";
 import SportPicker from "../components/shared/SportPicker";
-import { APP_AVATARS, DEFAULT_AVATAR_ID, avatarImageUrl } from "../services/avatars";
+import { DEFAULT_AVATAR_ID, avatarImageUrl } from "../services/avatars";
 import { callableErrorMessage } from "../services/functions";
 import { uploadProfilePhoto } from "../services/profilePhotos";
 import PlayerAvatar from "../components/shared/PlayerAvatar";
+import AvatarEditor from "../components/shared/AvatarEditor";
+import { PhotoIcon } from "../components/shared/icons";
 
 
 type Step = "profile" | "hand" | "skill" | "success";
@@ -54,7 +56,9 @@ export default function ProfileSetupPage() {
   const [phone, setPhone] = useState("");
   const [gender, setGender] = useState<"male" | "female">("male");
   const [dateOfBirth, setDateOfBirth] = useState("");
-  const [selectedAvatar, setSelectedAvatar] = useState(DEFAULT_AVATAR_ID);
+  // None picked in the UI; DEFAULT_AVATAR_ID is saved if the user skips it.
+  const [selectedAvatar, setSelectedAvatar] = useState<string | null>(null);
+  const [editingAvatar, setEditingAvatar] = useState(false);
   // Optional photo; uploaded only after the player doc is created.
   const photoInputRef = useRef<HTMLInputElement>(null);
   const [photoFile, setPhotoFile] = useState<File | null>(null);
@@ -142,7 +146,7 @@ export default function ProfileSetupPage() {
         email: user.email,
         phone: phone.trim(),
         gender,
-        avatarId: selectedAvatar,
+        avatarId: selectedAvatar ?? DEFAULT_AVATAR_ID,
         homeCountryCode: homeCountryCode || undefined,
         homePostalCode: homePostalCode.trim() || undefined,
         dateOfBirth,
@@ -262,43 +266,55 @@ export default function ProfileSetupPage() {
             </div>
 
             <div className="form-group">
-              <label>Profile Photo (optional)</label>
-              <div className="photo-actions" style={{ alignItems: "center" }}>
-                {photoPreview && (
-                  <img src={photoPreview} alt="Your photo" style={{ width: 56, height: 56, borderRadius: "50%", objectFit: "cover", flexShrink: 0 }} />
-                )}
-                <input ref={photoInputRef} type="file" accept="image/*" hidden onChange={handlePhotoPicked} />
-                <button type="button" className="btn-outline" onClick={() => photoInputRef.current?.click()}>
-                  {photoFile ? "Change Photo" : "Upload Photo"}
-                </button>
-                {photoFile && (
-                  <button type="button" className="btn-outline" onClick={() => setPhotoFile(null)}>
-                    Remove Photo
+              <label>Profile Picture</label>
+              <input ref={photoInputRef} type="file" accept="image/*" hidden onChange={handlePhotoPicked} />
+              <div className="picture-card">
+                <div className="picture-row">
+                  {photoPreview ? (
+                    <img src={photoPreview} alt="Your photo" className="picture-circle" />
+                  ) : (
+                    <div className="picture-circle upload"><PhotoIcon size={22} /></div>
+                  )}
+                  <div className="picture-text">
+                    <div className="picture-title">Upload photo</div>
+                    {photoFile ? (
+                      <button type="button" className="picture-action picture-remove" onClick={() => setPhotoFile(null)}>Remove</button>
+                    ) : (
+                      <div className="picture-sub">Optional</div>
+                    )}
+                  </div>
+                  <button type="button" className="picture-action" onClick={() => photoInputRef.current?.click()}>
+                    {photoFile ? "Change" : "Upload"}
                   </button>
-                )}
+                </div>
+                <div className="picture-row">
+                  {selectedAvatar ? (
+                    <img src={avatarImageUrl(selectedAvatar)} alt="" className="picture-circle" />
+                  ) : (
+                    <div className="picture-circle" />
+                  )}
+                  <div className="picture-text">
+                    <div className="picture-title">Choose an avatar</div>
+                    <div className="picture-sub">{photoFile && selectedAvatar ? "Shown if you remove your photo" : "Optional"}</div>
+                  </div>
+                  <button type="button" className="picture-action" onClick={() => setEditingAvatar(true)}>
+                    Change &#x203A;
+                  </button>
+                </div>
               </div>
-              {photoFile && (
-                <p className="photo-status">Pick an avatar to use it instead of your photo.</p>
-              )}
             </div>
 
-            <div className="form-group">
-              <label>Choose Your Avatar</label>
-              <div className="avatar-grid">
-                {APP_AVATARS.map((a) => (
-                  <button
-                    key={a.id}
-                    type="button"
-                    className={`avatar-option${selectedAvatar === a.id ? " selected" : ""}`}
-                    onClick={() => { setSelectedAvatar(a.id); setPhotoFile(null); }}
-                    title={a.name}
-                    aria-label={a.name}
-                  >
-                    <img src={avatarImageUrl(a.id)} alt="" loading="lazy" />
-                  </button>
-                ))}
-              </div>
-            </div>
+            {editingAvatar && (
+              <AvatarEditor
+                name={name.trim() || "Your profile"}
+                photoURL={photoPreview}
+                avatarId={selectedAvatar ?? DEFAULT_AVATAR_ID}
+                onPickPhoto={setPhotoFile}
+                onRemovePhoto={() => setPhotoFile(null)}
+                onSave={(id) => { setSelectedAvatar(id); setEditingAvatar(false); }}
+                onCancel={() => setEditingAvatar(false)}
+              />
+            )}
 
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
               <div className="form-group">
