@@ -58,7 +58,8 @@ export default function ProfileSetupPage() {
   // None picked in the UI; DEFAULT_AVATAR_ID is saved if the user skips it.
   const [selectedAvatar, setSelectedAvatar] = useState<string | null>(null);
   const [choosingAvatar, setChoosingAvatar] = useState(false);
-  // Optional photo; uploaded only after the player doc is created.
+  // Photo is uploaded only after the player doc is created. A photo or an
+  // avatar is required (same as the apps).
   const photoInputRef = useRef<HTMLInputElement>(null);
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
@@ -95,8 +96,10 @@ export default function ProfileSetupPage() {
   const age = dateOfBirth ? calculateAge(dateOfBirth) : null;
   const isUnderAge = age !== null && age < MINIMUM_AGE;
   // Same as the apps: Next stays disabled until every required field is filled.
+  const hasPicture = !!photoFile || !!selectedAvatar;
   const canContinue =
-    name.trim().length >= 2 && !!dateOfBirth && !isUnderAge && !!preferredSport && homePostalCode.trim() !== "";
+    name.trim().length >= 2 && !!dateOfBirth && !isUnderAge && !!preferredSport && homePostalCode.trim() !== "" &&
+    hasPicture;
 
   function handleProfileNext(e: FormEvent) {
     e.preventDefault();
@@ -120,6 +123,10 @@ export default function ProfileSetupPage() {
     }
     if (!homePostalCode.trim()) {
       setError("Zip / Postal code is required.");
+      return;
+    }
+    if (!hasPicture) {
+      setError("Add a photo or choose an avatar to continue.");
       return;
     }
 
@@ -161,7 +168,11 @@ export default function ProfileSetupPage() {
             setPhotoStatus(f < 1 ? `Uploading photo... ${Math.round(f * 100)}%` : "Checking photo...");
           }));
         } catch (err) {
-          setPhotoError(callableErrorMessage(err, "Couldn't upload your photo. You can add one later from your profile."));
+          const reason = callableErrorMessage(err, "Couldn't upload your photo.");
+          // Photo only: the default avatar was saved in its place.
+          setPhotoError(selectedAvatar
+            ? `${reason} You can add one later on your Profile page.`
+            : `${reason} We've given you a default avatar; you can change it on your Profile page.`);
         } finally {
           setPhotoStatus("");
         }
@@ -279,7 +290,7 @@ export default function ProfileSetupPage() {
                     {photoFile ? (
                       <button type="button" className="picture-action picture-remove" onClick={(e) => { e.stopPropagation(); setPhotoFile(null); }}>Remove</button>
                     ) : (
-                      <div className="picture-sub">Optional</div>
+                      <div className="picture-sub">Add a photo</div>
                     )}
                   </div>
                   <button type="button" className="picture-action">
@@ -294,7 +305,7 @@ export default function ProfileSetupPage() {
                   )}
                   <div className="picture-text">
                     <div className="picture-title">Choose an avatar</div>
-                    <div className="picture-sub">{APP_AVATARS.find((a) => a.id === selectedAvatar)?.name ?? "Optional"}</div>
+                    <div className="picture-sub">{APP_AVATARS.find((a) => a.id === selectedAvatar)?.name ?? "Pick one"}</div>
                   </div>
                   <button type="button" className="picture-action" aria-expanded={choosingAvatar} onClick={() => setChoosingAvatar((v) => !v)}>
                     {choosingAvatar ? "Done" : <>Change &#x203A;</>}
@@ -321,6 +332,11 @@ export default function ProfileSetupPage() {
                   </div>
                 )}
               </div>
+              {!hasPicture && (
+                <p style={{ fontSize: "0.8rem", color: "var(--gray-400)", marginTop: 6 }}>
+                  Add a photo or choose an avatar to continue.
+                </p>
+              )}
             </div>
 
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
