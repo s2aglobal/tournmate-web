@@ -10,6 +10,7 @@ import { callableErrorMessage } from "../services/functions";
 import { uploadProfilePhoto } from "../services/profilePhotos";
 import PlayerAvatar from "../components/shared/PlayerAvatar";
 import { PhotoIcon } from "../components/shared/icons";
+import AvatarSheet from "../components/shared/AvatarSheet";
 
 
 type Step = "profile" | "hand" | "skill" | "success";
@@ -297,7 +298,7 @@ export default function ProfileSetupPage() {
                     {photoFile ? "Change" : "Upload"}
                   </button>
                 </div>
-                <div className="picture-row">
+                <div className="picture-row clickable" onClick={() => setChoosingAvatar(true)}>
                   {selectedAvatar ? (
                     <img src={avatarImageUrl(selectedAvatar)} alt="" className="picture-circle" />
                   ) : (
@@ -307,31 +308,18 @@ export default function ProfileSetupPage() {
                     <div className="picture-title">Choose an avatar</div>
                     <div className="picture-sub">{APP_AVATARS.find((a) => a.id === selectedAvatar)?.name ?? "Pick one"}</div>
                   </div>
-                  <button type="button" className="picture-action" aria-expanded={choosingAvatar} onClick={() => setChoosingAvatar((v) => !v)}>
-                    {choosingAvatar ? "Done" : <>Change &#x203A;</>}
+                  <button type="button" className="picture-action">
+                    Change &#x203A;
                   </button>
                 </div>
-                {choosingAvatar && (
-                  <div className="picture-avatar-grid avatar-editor-grid">
-                    {APP_AVATARS.map((a) => (
-                      <button
-                        key={a.id}
-                        type="button"
-                        className={`avatar-editor-option${selectedAvatar === a.id ? " selected" : ""}`}
-                        aria-label={a.name}
-                        aria-pressed={selectedAvatar === a.id}
-                        onClick={() => setSelectedAvatar(a.id)}
-                      >
-                        <span className="avatar-editor-circle">
-                          <img src={avatarImageUrl(a.id)} alt="" loading="lazy" />
-                          {selectedAvatar === a.id && <span className="avatar-editor-badge" aria-hidden="true">&#x2713;</span>}
-                        </span>
-                        <span className="avatar-editor-label">{a.name}</span>
-                      </button>
-                    ))}
-                  </div>
-                )}
               </div>
+              {choosingAvatar && (
+                <AvatarSheet
+                  avatarId={selectedAvatar}
+                  onDone={(id) => { setSelectedAvatar(id); setChoosingAvatar(false); }}
+                  onCancel={() => setChoosingAvatar(false)}
+                />
+              )}
               {!hasPicture && (
                 <p style={{ fontSize: "0.8rem", color: "var(--gray-400)", marginTop: 6 }}>
                   Add a photo or choose an avatar to continue.
