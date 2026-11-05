@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type ChangeEvent, type FormEvent } from "react";
+import { useEffect, useRef, useState, type ChangeEvent, type FormEvent, type KeyboardEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import { createPlayer } from "../services/api";
@@ -9,9 +9,16 @@ import { APP_AVATARS, DEFAULT_AVATAR_ID, avatarImageUrl } from "../services/avat
 import { callableErrorMessage } from "../services/functions";
 import { uploadProfilePhoto } from "../services/profilePhotos";
 import PlayerAvatar from "../components/shared/PlayerAvatar";
-import { PhotoIcon } from "../components/shared/icons";
+import { PersonIcon, PhotoIcon } from "../components/shared/icons";
+import InfoTip from "../components/shared/InfoTip";
 import AvatarSheet from "../components/shared/AvatarSheet";
 
+
+/** Enter / Space activate a role="button" element. */
+function activateOnKey(e: KeyboardEvent, action: () => void) {
+  if (e.target !== e.currentTarget) return;
+  if (e.key === "Enter" || e.key === " ") { e.preventDefault(); action(); }
+}
 
 type Step = "profile" | "hand" | "skill" | "success";
 type PlayingHand = "right" | "left";
@@ -91,7 +98,8 @@ export default function ProfileSetupPage() {
   function handlePhotoPicked(e: ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     e.target.value = "";
-    if (file) setPhotoFile(file);
+    // One choice: a photo replaces the avatar (the default is saved as a hidden backup).
+    if (file) { setPhotoFile(file); setSelectedAvatar(null); }
   }
 
   const age = dateOfBirth ? calculateAge(dateOfBirth) : null;
@@ -170,10 +178,8 @@ export default function ProfileSetupPage() {
           }));
         } catch (err) {
           const reason = callableErrorMessage(err, "Couldn't upload your photo.");
-          // Photo only: the default avatar was saved in its place.
-          setPhotoError(selectedAvatar
-            ? `${reason} You can add one later on your Profile page.`
-            : `${reason} We've given you a default avatar; you can change it on your Profile page.`);
+          // The default avatar was saved in its place.
+          setPhotoError(`${reason} We've given you a default avatar; you can change it on your Profile page.`);
         } finally {
           setPhotoStatus("");
         }
@@ -277,46 +283,62 @@ export default function ProfileSetupPage() {
             </div>
 
             <div className="form-group">
-              <label>Profile Picture</label>
+              <div className="picture-header">
+                <span className="picture-heading">Profile Picture</span>
+                <InfoTip id="picture-info" text="You can use a photo or an avatar, not both. Picking one replaces the other." />
+              </div>
+              <p className="picture-caption">Choose one. This is what other players see.</p>
               <input ref={photoInputRef} type="file" accept="image/*" hidden onChange={handlePhotoPicked} />
-              <div className="picture-card">
-                <div className="picture-row clickable" onClick={() => photoInputRef.current?.click()}>
-                  {photoPreview ? (
-                    <img src={photoPreview} alt="Your photo" className="picture-circle" />
+              <div
+                className={`picture-option${photoFile ? " selected" : ""}`}
+                role="button"
+                tabIndex={0}
+                aria-label="Upload photo"
+                onClick={() => photoInputRef.current?.click()}
+                onKeyDown={(e) => activateOnKey(e, () => photoInputRef.current?.click())}
+              >
+                {photoPreview ? (
+                  <img src={photoPreview} alt="" className="picture-circle" />
+                ) : (
+                  <div className="picture-circle upload"><PhotoIcon size={22} /></div>
+                )}
+                <div className="picture-text">
+                  <div className="picture-title">Upload photo</div>
+                  {photoFile ? (
+                    <div className="picture-sub">
+                      Selected &middot;{" "}
+                      <button type="button" className="picture-remove" onClick={(e) => { e.stopPropagation(); setPhotoFile(null); }}>Remove</button>
+                    </div>
                   ) : (
-                    <div className="picture-circle upload"><PhotoIcon size={22} /></div>
+                    <div className="picture-sub">From your device</div>
                   )}
-                  <div className="picture-text">
-                    <div className="picture-title">Upload photo</div>
-                    {photoFile ? (
-                      <button type="button" className="picture-action picture-remove" onClick={(e) => { e.stopPropagation(); setPhotoFile(null); }}>Remove</button>
-                    ) : (
-                      <div className="picture-sub">Add a photo</div>
-                    )}
-                  </div>
-                  <button type="button" className="picture-action">
-                    {photoFile ? "Change" : "Upload"}
-                  </button>
                 </div>
-                <div className="picture-row clickable" onClick={() => setChoosingAvatar(true)}>
-                  {selectedAvatar ? (
-                    <img src={avatarImageUrl(selectedAvatar)} alt="" className="picture-circle" />
-                  ) : (
-                    <div className="picture-circle" />
-                  )}
-                  <div className="picture-text">
-                    <div className="picture-title">Choose an avatar</div>
-                    <div className="picture-sub">{APP_AVATARS.find((a) => a.id === selectedAvatar)?.name ?? "Pick one"}</div>
-                  </div>
-                  <button type="button" className="picture-action">
-                    Change &#x203A;
-                  </button>
+              </div>
+              <div
+                className={`picture-option${selectedAvatar ? " selected" : ""}`}
+                role="button"
+                tabIndex={0}
+                aria-label="Choose an avatar"
+                onClick={() => setChoosingAvatar(true)}
+                onKeyDown={(e) => activateOnKey(e, () => setChoosingAvatar(true))}
+              >
+                {selectedAvatar ? (
+                  <img src={avatarImageUrl(selectedAvatar)} alt="" className="picture-circle" />
+                ) : (
+                  <div className="picture-circle person"><PersonIcon size={24} /></div>
+                )}
+                <div className="picture-text">
+                  <div className="picture-title">Choose an avatar</div>
+                  <div className="picture-sub">{selectedAvatar ? `${APP_AVATARS.find((a) => a.id === selectedAvatar)?.name} · Selected` : "Pick from the gallery"}</div>
                 </div>
+                <span className="picture-chevron" aria-hidden="true">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round"><path d="m9 6 6 6-6 6" /></svg>
+                </span>
               </div>
               {choosingAvatar && (
                 <AvatarSheet
                   avatarId={selectedAvatar}
-                  onDone={(id) => { setSelectedAvatar(id); setChoosingAvatar(false); }}
+                  onDone={(id) => { setSelectedAvatar(id); setPhotoFile(null); setChoosingAvatar(false); }}
                   onCancel={() => setChoosingAvatar(false)}
                 />
               )}
