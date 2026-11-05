@@ -5,11 +5,10 @@ import { createPlayer } from "../services/api";
 import { useSiteConfig } from "../services/siteConfig";
 import StoreButtons from "../components/shared/StoreButtons";
 import SportPicker from "../components/shared/SportPicker";
-import { DEFAULT_AVATAR_ID, avatarImageUrl } from "../services/avatars";
+import { APP_AVATARS, DEFAULT_AVATAR_ID, avatarImageUrl } from "../services/avatars";
 import { callableErrorMessage } from "../services/functions";
 import { uploadProfilePhoto } from "../services/profilePhotos";
 import PlayerAvatar from "../components/shared/PlayerAvatar";
-import AvatarEditor from "../components/shared/AvatarEditor";
 import { PhotoIcon } from "../components/shared/icons";
 
 
@@ -58,7 +57,7 @@ export default function ProfileSetupPage() {
   const [dateOfBirth, setDateOfBirth] = useState("");
   // None picked in the UI; DEFAULT_AVATAR_ID is saved if the user skips it.
   const [selectedAvatar, setSelectedAvatar] = useState<string | null>(null);
-  const [editingAvatar, setEditingAvatar] = useState(false);
+  const [choosingAvatar, setChoosingAvatar] = useState(false);
   // Optional photo; uploaded only after the player doc is created.
   const photoInputRef = useRef<HTMLInputElement>(null);
   const [photoFile, setPhotoFile] = useState<File | null>(null);
@@ -269,7 +268,7 @@ export default function ProfileSetupPage() {
               <label>Profile Picture</label>
               <input ref={photoInputRef} type="file" accept="image/*" hidden onChange={handlePhotoPicked} />
               <div className="picture-card">
-                <div className="picture-row">
+                <div className="picture-row clickable" onClick={() => photoInputRef.current?.click()}>
                   {photoPreview ? (
                     <img src={photoPreview} alt="Your photo" className="picture-circle" />
                   ) : (
@@ -278,12 +277,12 @@ export default function ProfileSetupPage() {
                   <div className="picture-text">
                     <div className="picture-title">Upload photo</div>
                     {photoFile ? (
-                      <button type="button" className="picture-action picture-remove" onClick={() => setPhotoFile(null)}>Remove</button>
+                      <button type="button" className="picture-action picture-remove" onClick={(e) => { e.stopPropagation(); setPhotoFile(null); }}>Remove</button>
                     ) : (
                       <div className="picture-sub">Optional</div>
                     )}
                   </div>
-                  <button type="button" className="picture-action" onClick={() => photoInputRef.current?.click()}>
+                  <button type="button" className="picture-action">
                     {photoFile ? "Change" : "Upload"}
                   </button>
                 </div>
@@ -295,26 +294,34 @@ export default function ProfileSetupPage() {
                   )}
                   <div className="picture-text">
                     <div className="picture-title">Choose an avatar</div>
-                    <div className="picture-sub">{photoFile && selectedAvatar ? "Shown if you remove your photo" : "Optional"}</div>
+                    <div className="picture-sub">{APP_AVATARS.find((a) => a.id === selectedAvatar)?.name ?? "Optional"}</div>
                   </div>
-                  <button type="button" className="picture-action" onClick={() => setEditingAvatar(true)}>
-                    Change &#x203A;
+                  <button type="button" className="picture-action" aria-expanded={choosingAvatar} onClick={() => setChoosingAvatar((v) => !v)}>
+                    {choosingAvatar ? "Done" : <>Change &#x203A;</>}
                   </button>
                 </div>
+                {choosingAvatar && (
+                  <div className="picture-avatar-grid avatar-editor-grid">
+                    {APP_AVATARS.map((a) => (
+                      <button
+                        key={a.id}
+                        type="button"
+                        className={`avatar-editor-option${selectedAvatar === a.id ? " selected" : ""}`}
+                        aria-label={a.name}
+                        aria-pressed={selectedAvatar === a.id}
+                        onClick={() => setSelectedAvatar(a.id)}
+                      >
+                        <span className="avatar-editor-circle">
+                          <img src={avatarImageUrl(a.id)} alt="" loading="lazy" />
+                          {selectedAvatar === a.id && <span className="avatar-editor-badge" aria-hidden="true">&#x2713;</span>}
+                        </span>
+                        <span className="avatar-editor-label">{a.name}</span>
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
-
-            {editingAvatar && (
-              <AvatarEditor
-                name={name.trim() || "Your profile"}
-                photoURL={photoPreview}
-                avatarId={selectedAvatar ?? DEFAULT_AVATAR_ID}
-                onPickPhoto={setPhotoFile}
-                onRemovePhoto={() => setPhotoFile(null)}
-                onSave={(id) => { setSelectedAvatar(id); setEditingAvatar(false); }}
-                onCancel={() => setEditingAvatar(false)}
-              />
-            )}
 
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
               <div className="form-group">
@@ -470,7 +477,7 @@ export default function ProfileSetupPage() {
         {photoError && <div className="alert error" style={{ marginTop: 16 }}>{photoError}</div>}
         <PlayerAvatar
           photoURL={photoURL}
-          avatarId={selectedAvatar}
+          avatarId={selectedAvatar ?? DEFAULT_AVATAR_ID}
           alt="Your avatar"
           style={{
             width: 100,

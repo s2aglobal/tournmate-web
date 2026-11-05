@@ -948,6 +948,9 @@ a { text-decoration: none; color: inherit; }
 .picture-circle.upload {
   border: 2px dashed var(--brand-purple); background: rgba(125,56,237,0.08); color: var(--brand-purple);
 }
+.picture-row.clickable { cursor: pointer; }
+.picture-avatar-grid { background: #F5F2FA; padding: 18px 16px; }
+.picture-avatar-grid .avatar-editor-circle { background: transparent; }
 .picture-text { flex: 1; min-width: 0; }
 .picture-title { font-weight: 700; color: var(--dark-navy); }
 .picture-sub { font-size: 0.85rem; color: var(--gray-500); }
