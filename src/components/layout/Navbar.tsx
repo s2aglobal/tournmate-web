@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth";
 import { signOut } from "../../services/auth";
-import { avatarImageUrl } from "../../services/avatars";
+import PlayerAvatar from "../shared/PlayerAvatar";
 
 export default function Navbar() {
   const { user, player } = useAuth();
@@ -40,10 +40,6 @@ export default function Navbar() {
         .slice(0, 2)
     : user?.email?.[0]?.toUpperCase() ?? "?";
 
-  const avatarSrc = player
-    ? avatarImageUrl(player.avatarId, player.name)
-    : null;
-
   async function handleSignOut() {
     setMenuOpen(false);
     await signOut();
@@ -75,8 +71,8 @@ export default function Navbar() {
                 onClick={() => setMenuOpen((v) => !v)}
                 aria-label="Profile menu"
               >
-                {avatarSrc ? (
-                  <img src={avatarSrc} alt={player?.name} className="nav-avatar-img" />
+                {player ? (
+                  <PlayerAvatar photoURL={player.photoURL} avatarId={player.avatarId} nameSeed={player.name} alt={player.name} className="nav-avatar-img" />
                 ) : (
                   <div className="nav-user-avatar">{initials}</div>
                 )}
@@ -86,9 +82,7 @@ export default function Navbar() {
                 <div className="nav-dropdown">
                   {player && (
                     <div className="nav-dropdown-header">
-                      {avatarSrc && (
-                        <img src={avatarSrc} alt="" className="nav-dropdown-avatar" />
-                      )}
+                      <PlayerAvatar photoURL={player.photoURL} avatarId={player.avatarId} nameSeed={player.name} className="nav-dropdown-avatar" />
                       <div>
                         <div className="nav-dropdown-name">{player.name}</div>
                         <div className="nav-dropdown-email">{player.email}</div>

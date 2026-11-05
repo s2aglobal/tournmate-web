@@ -2,12 +2,13 @@ import {
   createContext,
   useContext,
   useEffect,
+  useRef,
   useState,
   type ReactNode,
 } from "react";
 import { onAuthStateChanged, type User } from "firebase/auth";
 import { auth } from "../services/firebase";
-import { getMyPlayer, type PlayerProfile } from "../services/api";
+import { getMyPlayer, watchPlayer, type PlayerProfile } from "../services/api";
 
 interface AuthState {
   user: User | null;
@@ -30,14 +31,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [player, setPlayer] = useState<PlayerProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [playerLoading, setPlayerLoading] = useState(false);
+  // Live listener on the signed-in player's doc (photo set in the app, etc.).
+  const stopWatching = useRef<(() => void) | null>(null);
+
+  function watch(p: PlayerProfile | null) {
+    stopWatching.current?.();
+    stopWatching.current = p ? watchPlayer(p.id, (fresh) => { if (fresh) setPlayer(fresh); }) : null;
+  }
 
   async function fetchPlayer(uid: string) {
     setPlayerLoading(true);
     try {
       const p = await getMyPlayer(uid);
       setPlayer(p);
+      watch(p);
     } catch {
       setPlayer(null);
+      watch(null);
     } finally {
       setPlayerLoading(false);
     }
@@ -50,10 +60,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         await fetchPlayer(firebaseUser.uid);
       } else {
         setPlayer(null);
+        watch(null);
       }
       setLoading(false);
     });
-    return unsubscribe;
+    return () => {
+      unsubscribe();
+      watch(null);
+    };
   }, []);
 
   const refreshPlayer = async () => {
