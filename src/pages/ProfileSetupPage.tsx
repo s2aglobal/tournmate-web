@@ -278,7 +278,7 @@ export default function ProfileSetupPage() {
                 )}
               </div>
               {photoFile && (
-                <p className="photo-status">Your photo shows instead of your avatar. The avatar is used if you remove it.</p>
+                <p className="photo-status">Pick an avatar to use it instead of your photo.</p>
               )}
             </div>
 
@@ -290,7 +290,7 @@ export default function ProfileSetupPage() {
                     key={a.id}
                     type="button"
                     className={`avatar-option${selectedAvatar === a.id ? " selected" : ""}`}
-                    onClick={() => setSelectedAvatar(a.id)}
+                    onClick={() => { setSelectedAvatar(a.id); setPhotoFile(null); }}
                     title={a.name}
                     aria-label={a.name}
                   >
