@@ -10,7 +10,11 @@ import {
   type SportsmanshipData,
   type FitnessData,
 } from "../services/api";
-import { APP_AVATARS, DEFAULT_AVATAR_ID, avatarImageUrl } from "../services/avatars";
+import { removeProfilePhoto, callableErrorMessage } from "../services/functions";
+import { uploadProfilePhoto } from "../services/profilePhotos";
+import PlayerAvatar from "../components/shared/PlayerAvatar";
+import ConfirmDialog from "../components/shared/ConfirmDialog";
+import AvatarEditor from "../components/shared/AvatarEditor";
 
 
 function tierForElo(elo: number): { name: string; color: string; next: number | null } {
@@ -57,12 +61,16 @@ export default function ProfilePage() {
   const { player, user, refreshPlayer } = useAuth();
 
   const [editingAvatar, setEditingAvatar] = useState(false);
-  const [selectedAvatar, setSelectedAvatar] = useState(player?.avatarId ?? DEFAULT_AVATAR_ID);
+  // Avatar picked in the editor, waiting on the "remove your photo?" confirm.
+  const [pendingAvatar, setPendingAvatar] = useState<string | null>(null);
   const [editingRegion, setEditingRegion] = useState(false);
   const [homeCountryCode, setHomeCountryCode] = useState(player?.homeCountryCode ?? "US");
   const [homePostalCode, setHomePostalCode] = useState(player?.homePostalCode ?? "");
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState("");
+  // Photo upload / removal: status text while busy, error from the server.
+  const [photoStatus, setPhotoStatus] = useState("");
+  const [photoError, setPhotoError] = useState("");
 
   const [matchStats, setMatchStats] = useState<MatchStats | null>(null);
   const [sportsmanship, setSportsmanship] = useState<SportsmanshipData | null>(null);
@@ -82,18 +90,79 @@ export default function ProfilePage() {
   const age = player.dateOfBirth ? ageFromTimestamp(player.dateOfBirth) : null;
   const avatarSeed = player.name;
 
-  async function saveAvatar() {
+  function closeEditor() {
+    setEditingAvatar(false);
+    setPhotoError("");
+  }
+
+  function handleSaveAvatar(avatarId: string) {
+    // With a photo set, the photo shows instead of the avatar, so switching
+    // to a different avatar means removing the photo first.
+    if (player!.photoURL) {
+      setPendingAvatar(avatarId);
+      return;
+    }
+    saveAvatar(avatarId, false);
+  }
+
+  async function saveAvatar(avatarId: string, removePhoto: boolean) {
     setSaving(true);
     setMessage("");
+    setPhotoError("");
+    if (removePhoto) {
+      try {
+        await removeProfilePhoto();
+      } catch (err) {
+        setPendingAvatar(null);
+        setSaving(false);
+        setPhotoError(callableErrorMessage(err, "Couldn't remove your photo. Please try again."));
+        return;
+      }
+    }
     try {
-      await updatePlayer(player!.id, user!.uid, { avatarId: selectedAvatar });
+      await updatePlayer(player!.id, user!.uid, { avatarId });
       await refreshPlayer();
       setEditingAvatar(false);
       setMessage("Avatar updated!");
     } catch {
       setMessage("Failed to update avatar.");
+      // The photo may already be gone; show the current state.
+      if (removePhoto) await refreshPlayer();
     } finally {
+      setPendingAvatar(null);
       setSaving(false);
+    }
+  }
+
+  async function handlePhotoPicked(file: File) {
+    setPhotoError("");
+    setMessage("");
+    setPhotoStatus("Uploading... 0%");
+    try {
+      await uploadProfilePhoto(user!.uid, file, (f) => {
+        setPhotoStatus(f < 1 ? `Uploading... ${Math.round(f * 100)}%` : "Checking photo...");
+      });
+      await refreshPlayer();
+      setMessage("Photo updated!");
+    } catch (err) {
+      setPhotoError(callableErrorMessage(err, "Couldn't upload your photo. Please try again."));
+    } finally {
+      setPhotoStatus("");
+    }
+  }
+
+  async function handleRemovePhoto() {
+    setPhotoError("");
+    setMessage("");
+    setPhotoStatus("Removing photo...");
+    try {
+      await removeProfilePhoto();
+      await refreshPlayer();
+      setMessage("Photo removed.");
+    } catch (err) {
+      setPhotoError(callableErrorMessage(err, "Couldn't remove your photo. Please try again."));
+    } finally {
+      setPhotoStatus("");
     }
   }
 
@@ -134,8 +203,8 @@ export default function ProfilePage() {
         <div className="profile-section">
           <div className="profile-header-card">
             <div className="profile-avatar-wrapper">
-              <img src={avatarImageUrl(player.avatarId, avatarSeed)} alt="Avatar" className="profile-lg-avatar" />
-              <button className="profile-avatar-edit" onClick={() => { setEditingAvatar(true); setMessage(""); }} title="Change avatar">
+              <PlayerAvatar photoURL={player.photoURL} avatarId={player.avatarId} nameSeed={avatarSeed} alt="Avatar" className="profile-lg-avatar" />
+              <button className="profile-avatar-edit" onClick={() => { setEditingAvatar(true); setMessage(""); }} title="Change photo or avatar">
                 &#x270F;&#xFE0F;
               </button>
             </div>
@@ -149,20 +218,30 @@ export default function ProfilePage() {
           </div>
 
           {editingAvatar && (
-            <div className="profile-edit-card">
-              <h3>Choose Avatar</h3>
-              <div className="avatar-grid">
-                {APP_AVATARS.map((a) => (
-                  <button key={a.id} type="button" title={a.name} aria-label={a.name} className={`avatar-option${selectedAvatar === a.id ? " selected" : ""}`} onClick={() => setSelectedAvatar(a.id)}>
-                    <img src={avatarImageUrl(a.id)} alt="" loading="lazy" />
-                  </button>
-                ))}
-              </div>
-              <div className="wizard-buttons">
-                <button className="btn-outline" onClick={() => setEditingAvatar(false)}>Cancel</button>
-                <button className="btn-primary" onClick={saveAvatar} disabled={saving}>{saving ? "Saving..." : "Save Avatar"}</button>
-              </div>
-            </div>
+            <AvatarEditor
+              name={player.name}
+              nameSeed={avatarSeed}
+              photoURL={player.photoURL || null}
+              avatarId={player.avatarId || null}
+              photoStatus={photoStatus}
+              error={photoError || (message.includes("Failed") ? message : "")}
+              saving={saving}
+              onPickPhoto={handlePhotoPicked}
+              onRemovePhoto={handleRemovePhoto}
+              onSave={handleSaveAvatar}
+              onCancel={closeEditor}
+            />
+          )}
+
+          {pendingAvatar && (
+            <ConfirmDialog
+              title="Use this avatar instead of your photo?"
+              message="Your photo will be removed."
+              confirmLabel="Use Avatar"
+              busy={saving}
+              onConfirm={() => saveAvatar(pendingAvatar, true)}
+              onCancel={() => setPendingAvatar(null)}
+            />
           )}
         </div>
 

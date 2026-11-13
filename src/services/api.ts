@@ -5,6 +5,7 @@ import {
   limit,
   getDocs,
   getDoc,
+  onSnapshot,
   doc,
   setDoc,
   updateDoc,
@@ -23,6 +24,8 @@ export interface PlayerProfile {
   elo: number;
   streak: number;
   avatarId: string;
+  /** Uploaded profile photo (server-written only). Missing/null/empty = none. */
+  photoURL?: string | null;
   homeCountryCode?: string;
   homePostalCode?: string;
   dateOfBirth?: Timestamp;
@@ -79,6 +82,21 @@ export async function getMyPlayer(
   } catch {
     return null;
   }
+}
+
+/**
+ * Follows the player doc so changes made elsewhere (a photo set in the app,
+ * the server clearing it) show up without a reload. Returns the unsubscribe.
+ */
+export function watchPlayer(
+  id: string,
+  onChange: (player: PlayerProfile | null) => void
+): () => void {
+  return onSnapshot(
+    doc(db, "players", id),
+    (snap) => onChange(snap.exists() ? ({ id: snap.id, ...snap.data() } as PlayerProfile) : null),
+    () => { /* keep the last known profile */ }
+  );
 }
 
 export async function createPlayer(
@@ -139,6 +157,11 @@ export async function createPlayer(
   return { id, ...playerDoc } as unknown as PlayerProfile;
 }
 
+/**
+ * Profile basics only. Photo fields (`photoURL`, `photoPath`,
+ * `photoUpdatedAt`) are server-written via `setProfilePhoto` /
+ * `removeProfilePhoto` and must never be added here.
+ */
 export interface UpdatePlayerPayload {
   name?: string;
   phone?: string;

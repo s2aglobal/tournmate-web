@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type ChangeEvent, type FormEvent, type KeyboardEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import { createPlayer } from "../services/api";
@@ -6,7 +6,19 @@ import { useSiteConfig } from "../services/siteConfig";
 import StoreButtons from "../components/shared/StoreButtons";
 import SportPicker from "../components/shared/SportPicker";
 import { APP_AVATARS, DEFAULT_AVATAR_ID, avatarImageUrl } from "../services/avatars";
+import { callableErrorMessage } from "../services/functions";
+import { uploadProfilePhoto } from "../services/profilePhotos";
+import PlayerAvatar from "../components/shared/PlayerAvatar";
+import { PersonIcon, PhotoIcon } from "../components/shared/icons";
+import InfoTip from "../components/shared/InfoTip";
+import AvatarSheet from "../components/shared/AvatarSheet";
 
+
+/** Enter / Space activate a role="button" element. */
+function activateOnKey(e: KeyboardEvent, action: () => void) {
+  if (e.target !== e.currentTarget) return;
+  if (e.key === "Enter" || e.key === " ") { e.preventDefault(); action(); }
+}
 
 type Step = "profile" | "hand" | "skill" | "success";
 type PlayingHand = "right" | "left";
@@ -51,7 +63,17 @@ export default function ProfileSetupPage() {
   const [phone, setPhone] = useState("");
   const [gender, setGender] = useState<"male" | "female">("male");
   const [dateOfBirth, setDateOfBirth] = useState("");
-  const [selectedAvatar, setSelectedAvatar] = useState(DEFAULT_AVATAR_ID);
+  // None picked in the UI; DEFAULT_AVATAR_ID is saved if the user skips it.
+  const [selectedAvatar, setSelectedAvatar] = useState<string | null>(null);
+  const [choosingAvatar, setChoosingAvatar] = useState(false);
+  // Photo is uploaded only after the player doc is created. A photo or an
+  // avatar is required (same as the apps).
+  const photoInputRef = useRef<HTMLInputElement>(null);
+  const [photoFile, setPhotoFile] = useState<File | null>(null);
+  const [photoPreview, setPhotoPreview] = useState<string | null>(null);
+  const [photoStatus, setPhotoStatus] = useState("");
+  const [photoError, setPhotoError] = useState("");
+  const [photoURL, setPhotoURL] = useState<string | null>(null);
   const [homeCountryCode, setHomeCountryCode] = useState("US");
   const [homePostalCode, setHomePostalCode] = useState("");
   // Same choice as the apps' "Your sport" (live sports from config/sports).
@@ -66,11 +88,27 @@ export default function ProfileSetupPage() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
+  useEffect(() => {
+    if (!photoFile) { setPhotoPreview(null); return; }
+    const url = URL.createObjectURL(photoFile);
+    setPhotoPreview(url);
+    return () => URL.revokeObjectURL(url);
+  }, [photoFile]);
+
+  function handlePhotoPicked(e: ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    // One choice: a photo replaces the avatar (the default is saved as a hidden backup).
+    if (file) { setPhotoFile(file); setSelectedAvatar(null); }
+  }
+
   const age = dateOfBirth ? calculateAge(dateOfBirth) : null;
   const isUnderAge = age !== null && age < MINIMUM_AGE;
   // Same as the apps: Next stays disabled until every required field is filled.
+  const hasPicture = !!photoFile || !!selectedAvatar;
   const canContinue =
-    name.trim().length >= 2 && !!dateOfBirth && !isUnderAge && !!preferredSport && homePostalCode.trim() !== "";
+    name.trim().length >= 2 && !!dateOfBirth && !isUnderAge && !!preferredSport && homePostalCode.trim() !== "" &&
+    hasPicture;
 
   function handleProfileNext(e: FormEvent) {
     e.preventDefault();
@@ -96,6 +134,10 @@ export default function ProfileSetupPage() {
       setError("Zip / Postal code is required.");
       return;
     }
+    if (!hasPicture) {
+      setError("Add a photo or choose an avatar to continue.");
+      return;
+    }
 
     setStep("hand");
   }
@@ -119,7 +161,7 @@ export default function ProfileSetupPage() {
         email: user.email,
         phone: phone.trim(),
         gender,
-        avatarId: selectedAvatar,
+        avatarId: selectedAvatar ?? DEFAULT_AVATAR_ID,
         homeCountryCode: homeCountryCode || undefined,
         homePostalCode: homePostalCode.trim() || undefined,
         dateOfBirth,
@@ -127,6 +169,21 @@ export default function ProfileSetupPage() {
         playingHand,
         skillLevel,
       });
+      if (photoFile) {
+        // The profile exists now; a failed photo doesn't undo it.
+        setPhotoStatus("Uploading photo... 0%");
+        try {
+          setPhotoURL(await uploadProfilePhoto(user.uid, photoFile, (f) => {
+            setPhotoStatus(f < 1 ? `Uploading photo... ${Math.round(f * 100)}%` : "Checking photo...");
+          }));
+        } catch (err) {
+          const reason = callableErrorMessage(err, "Couldn't upload your photo.");
+          // The default avatar was saved in its place.
+          setPhotoError(`${reason} We've given you a default avatar; you can change it on your Profile page.`);
+        } finally {
+          setPhotoStatus("");
+        }
+      }
       await refreshPlayer();
       setStep("success");
     } catch (err: unknown) {
@@ -226,21 +283,65 @@ export default function ProfileSetupPage() {
             </div>
 
             <div className="form-group">
-              <label>Choose Your Avatar</label>
-              <div className="avatar-grid">
-                {APP_AVATARS.map((a) => (
-                  <button
-                    key={a.id}
-                    type="button"
-                    className={`avatar-option${selectedAvatar === a.id ? " selected" : ""}`}
-                    onClick={() => setSelectedAvatar(a.id)}
-                    title={a.name}
-                    aria-label={a.name}
-                  >
-                    <img src={avatarImageUrl(a.id)} alt="" loading="lazy" />
-                  </button>
-                ))}
+              <div className="picture-header">
+                <span className="picture-heading">Profile Picture</span>
+                <InfoTip id="picture-info" text="You can use a photo or an avatar, not both. Picking one replaces the other." />
               </div>
+              <p className="picture-caption">Choose one. This is what other players see.</p>
+              <input ref={photoInputRef} type="file" accept="image/*" hidden onChange={handlePhotoPicked} />
+              <div
+                className={`picture-option${photoFile ? " selected" : ""}`}
+                role="button"
+                tabIndex={0}
+                aria-label="Upload photo"
+                onClick={() => photoInputRef.current?.click()}
+                onKeyDown={(e) => activateOnKey(e, () => photoInputRef.current?.click())}
+              >
+                {photoPreview ? (
+                  <img src={photoPreview} alt="" className="picture-circle" />
+                ) : (
+                  <div className="picture-circle upload"><PhotoIcon size={22} /></div>
+                )}
+                <div className="picture-text">
+                  <div className="picture-title">Upload photo</div>
+                  {photoFile ? (
+                    <div className="picture-sub">
+                      Selected &middot;{" "}
+                      <button type="button" className="picture-remove" onClick={(e) => { e.stopPropagation(); setPhotoFile(null); }}>Remove</button>
+                    </div>
+                  ) : (
+                    <div className="picture-sub">From your device</div>
+                  )}
+                </div>
+              </div>
+              <div
+                className={`picture-option${selectedAvatar ? " selected" : ""}`}
+                role="button"
+                tabIndex={0}
+                aria-label="Choose an avatar"
+                onClick={() => setChoosingAvatar(true)}
+                onKeyDown={(e) => activateOnKey(e, () => setChoosingAvatar(true))}
+              >
+                {selectedAvatar ? (
+                  <img src={avatarImageUrl(selectedAvatar)} alt="" className="picture-circle" />
+                ) : (
+                  <div className="picture-circle person"><PersonIcon size={24} /></div>
+                )}
+                <div className="picture-text">
+                  <div className="picture-title">Choose an avatar</div>
+                  <div className="picture-sub">{selectedAvatar ? `${APP_AVATARS.find((a) => a.id === selectedAvatar)?.name} · Selected` : "Pick from the gallery"}</div>
+                </div>
+                <span className="picture-chevron" aria-hidden="true">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round"><path d="m9 6 6 6-6 6" /></svg>
+                </span>
+              </div>
+              {choosingAvatar && (
+                <AvatarSheet
+                  avatarId={selectedAvatar}
+                  onDone={(id) => { setSelectedAvatar(id); setPhotoFile(null); setChoosingAvatar(false); }}
+                  onCancel={() => setChoosingAvatar(false)}
+                />
+              )}
             </div>
 
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
@@ -377,7 +478,7 @@ export default function ProfileSetupPage() {
               onClick={handleSkillDone}
               disabled={loading}
             >
-              {loading ? "Creating Profile..." : "Create Profile"}
+              {loading ? photoStatus || "Creating Profile..." : "Create Profile"}
             </button>
           </div>
         </div>
@@ -394,8 +495,10 @@ export default function ProfileSetupPage() {
         <p className="auth-subtitle">
           Your profile has been created. Welcome to TournMate!
         </p>
-        <img
-          src={avatarImageUrl(selectedAvatar)}
+        {photoError && <div className="alert error" style={{ marginTop: 16 }}>{photoError}</div>}
+        <PlayerAvatar
+          photoURL={photoURL}
+          avatarId={selectedAvatar ?? DEFAULT_AVATAR_ID}
           alt="Your avatar"
           style={{
             width: 100,
