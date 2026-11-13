@@ -70,6 +70,8 @@ function AppRoutes() {
         <Route path="/" element={<LandingPage />} />
         <Route path="/terms" element={<TermsPage />} />
         <Route path="/privacy" element={<PrivacyPage />} />
+        <Route path="/privacy.html" element={<PrivacyPage />} />
+        <Route path="/terms.html" element={<TermsPage />} />
         <Route
           path="/login"
           element={

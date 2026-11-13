@@ -14,7 +14,7 @@ const REQUIRED_FIREBASE_ENV = [
   "VITE_FIREBASE_APP_ID",
 ];
 
-export default defineConfig(({ command, mode }) => {
+export default defineConfig(({ command, mode, isSsrBuild }) => {
   if (command === "build") {
     const env = loadEnv(mode, process.cwd(), "VITE_");
     const missing = REQUIRED_FIREBASE_ENV.filter((key) => !env[key]?.trim());
@@ -34,6 +34,7 @@ export default defineConfig(({ command, mode }) => {
         closeBundle() {
           // GitHub Pages doesn't support SPA rewrites — copy index.html as 404.html
           // so all routes resolve to the React app instead of a GitHub 404 page
+          if (isSsrBuild) return;
           const dist = resolve(__dirname, "dist");
           copyFileSync(`${dist}/index.html`, `${dist}/404.html`);
         },
@@ -43,12 +44,16 @@ export default defineConfig(({ command, mode }) => {
       outDir: "dist",
       sourcemap: false,
       rollupOptions: {
-        output: {
-          manualChunks: {
-            firebase: ["firebase/app", "firebase/auth", "firebase/firestore", "firebase/functions", "firebase/storage"],
-            vendor: ["react", "react-dom", "react-router-dom"],
-          },
-        },
+        // The SSR build (scripts/prerender.tsx) externalizes dependencies, so
+        // manual chunks only apply to the browser build.
+        output: isSsrBuild
+          ? {}
+          : {
+              manualChunks: {
+                firebase: ["firebase/app", "firebase/auth", "firebase/firestore", "firebase/functions", "firebase/storage"],
+                vendor: ["react", "react-dom", "react-router-dom"],
+              },
+            },
       },
     },
   };
