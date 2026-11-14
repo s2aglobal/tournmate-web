@@ -6,7 +6,8 @@
         "appID": "CKU62A428C.com.s2aglobal.TournMate",
         "paths": [
           "/tournament/*",
-          "/session/*"
+          "/session/*",
+          "/crew/*"
         ]
       }
     ]

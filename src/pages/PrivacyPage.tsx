@@ -3,7 +3,7 @@ export default function PrivacyPage() {
     <main className="legal-page">
       <h1>Privacy Policy</h1>
       <p className="legal-meta">
-        Effective Date: April 1, 2026 &nbsp;|&nbsp; Last Updated: November 13, 2026
+        Effective Date: April 1, 2026 &nbsp;|&nbsp; Last Updated: November 14, 2026
       </p>
 
       <div className="legal-content">
@@ -145,10 +145,19 @@ export default function PrivacyPage() {
             players in tournaments you join.
           </li>
           <li>
-            YouTube access is used only to run live streams you start. Each
+            YouTube access is used only to run live streams you start, or that
+            members of your tournament crew start for your tournament. Each
             stream is published to your YouTube channel as an unlisted video so
             that people following the tournament can watch it inside TournMate.
-            You can end a stream at any time.
+            You can end any of these streams at any time.
+          </li>
+          <li>
+            <strong>Tournament crew:</strong> if you add people to your
+            tournament crew, they can start live streams of that tournament&apos;s
+            matches on your YouTube channel. They never receive your Google
+            login or YouTube tokens; our server creates each broadcast for them.
+            Crew access ends when the tournament finishes or when you remove
+            them.
           </li>
         </ul>
         <h3>How we store it</h3>
@@ -158,9 +167,15 @@ export default function PrivacyPage() {
             TournMate account on Google Firebase.
           </li>
           <li>
-            YouTube access tokens are stored securely on your device. We never
-            see your Google password, and we do not store YouTube tokens on our
-            servers.
+            We never see your Google password. When you connect YouTube, a
+            YouTube access token is stored securely on your device, and a
+            YouTube refresh token is stored encrypted on our servers (Google
+            Firebase) so that live streams can be created for your tournament
+            crew. The refresh token is used only for the live streaming actions
+            described above, is never shown to other users or apps, and is
+            deleted when you disconnect YouTube or delete your account. We also
+            store your YouTube channel name and ID to show which channel a
+            stream goes to.
           </li>
           <li>
             For each live stream we store the YouTube video ID, start and end
@@ -185,7 +200,8 @@ export default function PrivacyPage() {
         <h3>Removing access and deleting data</h3>
         <ul>
           <li>
-            You can disconnect YouTube in the App at any time, or revoke
+            You can disconnect YouTube in the App at any time; this revokes our
+            access and deletes the refresh token from our servers. You can also revoke
             TournMate&apos;s access from your Google account at{" "}
             <a href="https://myaccount.google.com/permissions" target="_blank" rel="noopener noreferrer">
               myaccount.google.com/permissions
