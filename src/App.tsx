@@ -6,6 +6,7 @@ import Footer from "./components/layout/Footer";
 import LandingPage from "./pages/LandingPage";
 import TermsPage from "./pages/TermsPage";
 import PrivacyPage from "./pages/PrivacyPage";
+import CommunityGuidelinesPage from "./pages/CommunityGuidelinesPage";
 import LoginPage from "./pages/LoginPage";
 import EmailVerificationPage from "./pages/EmailVerificationPage";
 import ProfileSetupPage from "./pages/ProfileSetupPage";
@@ -72,6 +73,8 @@ function AppRoutes() {
         <Route path="/privacy" element={<PrivacyPage />} />
         <Route path="/privacy.html" element={<PrivacyPage />} />
         <Route path="/terms.html" element={<TermsPage />} />
+        <Route path="/community-guidelines" element={<CommunityGuidelinesPage />} />
+        <Route path="/community-guidelines.html" element={<CommunityGuidelinesPage />} />
         <Route
           path="/login"
           element={
