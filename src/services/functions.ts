@@ -20,6 +20,27 @@ export async function removeProfilePhoto(): Promise<{ status: string }> {
 }
 
 /**
+ * Private profile fields the web sends. The web no longer collects a phone
+ * number, and the email is never sent: the server always takes it from
+ * Firebase Auth.
+ */
+export interface PrivateProfileInput {
+  /** Epoch milliseconds (the server also accepts an ISO date). */
+  dateOfBirth?: number;
+  homePostalCode?: string;
+  weightKg?: number;
+}
+
+/**
+ * Writes the caller's owner-only `playerPrivate/{myId}` doc. The server
+ * validates every field and refreshes the email from Auth.
+ */
+export async function updatePrivateProfile(input: PrivateProfileInput): Promise<void> {
+  const fn = httpsCallable<PrivateProfileInput, unknown>(functions, "updatePrivateProfile");
+  await fn(input);
+}
+
+/**
  * The server's user-facing HttpsError message, a PhotoUploadError's message
  * (see profilePhotos.ts), or `fallback`.
  */

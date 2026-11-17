@@ -9,17 +9,23 @@ import {
   doc,
   setDoc,
   updateDoc,
+  deleteField,
   Timestamp,
+  type DocumentData,
 } from "firebase/firestore";
 import { db } from "./firebase";
+import { updatePrivateProfile, type PrivateProfileInput } from "./functions";
 
 const playersRef = collection(db, "players");
 
+/**
+ * The signed-in player's own profile: the public `players/{id}` doc merged
+ * with the owner-only `playerPrivate/{id}` doc. Show the email from Firebase
+ * Auth (`user.email`), not from here.
+ */
 export interface PlayerProfile {
   id: string;
   name: string;
-  email: string;
-  phone: string;
   genderRaw: string;
   elo: number;
   streak: number;
@@ -27,10 +33,15 @@ export interface PlayerProfile {
   /** Uploaded profile photo (server-written only). Missing/null/empty = none. */
   photoURL?: string | null;
   homeCountryCode?: string;
+  // Private (from playerPrivate/{id}; older accounts may still have a public copy).
+  phone?: string;
   homePostalCode?: string;
   dateOfBirth?: Timestamp;
   weightKg?: number;
 }
+
+/** Fields that live in `playerPrivate/{id}` and are never written to `players/{id}`. */
+const PRIVATE_FIELDS = ["phone", "homePostalCode", "dateOfBirth", "weightKg"] as const;
 
 export interface MatchStats {
   matchesPlayed: number;
@@ -51,12 +62,11 @@ export interface FitnessData {
 
 export interface CreatePlayerPayload {
   name: string;
-  email: string;
-  phone: string;
   gender: "male" | "female";
   avatarId?: string;
   homeCountryCode?: string;
   homePostalCode?: string;
+  /** "YYYY-MM-DD" from the date input. */
   dateOfBirth?: string;
   /** Sport id (e.g. "pickleball"); the apps open on this sport. */
   preferredSport?: string;
@@ -64,6 +74,44 @@ export interface CreatePlayerPayload {
   playingHand?: string;
   /** "beginner" | "intermediate" | "advanced" | "pro", as the apps store it. */
   skillLevel?: string;
+}
+
+function isSet(v: unknown): boolean {
+  return v !== undefined && v !== null && v !== "";
+}
+
+/**
+ * Public doc + private doc. A private value wins; until every account is
+ * backfilled, a value still on the public doc is the fallback. The public
+ * `email`/`phone` placeholders are never used for display.
+ */
+function mergeProfile(
+  id: string,
+  pub: DocumentData,
+  priv: DocumentData | null
+): PlayerProfile {
+  const merged: Record<string, unknown> = { ...pub, id };
+  delete merged.email;
+  delete merged.fcmToken;
+  for (const key of PRIVATE_FIELDS) {
+    const value = priv && isSet(priv[key]) ? priv[key] : pub[key];
+    if (isSet(value)) merged[key] = value;
+    else delete merged[key];
+  }
+  return merged as unknown as PlayerProfile;
+}
+
+/**
+ * The owner's private doc, or null when it doesn't exist yet or can't be read
+ * (for example before the server's playerPrivate rules are deployed).
+ */
+async function getMyPrivate(playerId: string): Promise<DocumentData | null> {
+  try {
+    const snap = await getDoc(doc(db, "playerPrivate", playerId));
+    return snap.exists() ? snap.data() : null;
+  } catch {
+    return null;
+  }
 }
 
 export async function getMyPlayer(
@@ -78,32 +126,52 @@ export async function getMyPlayer(
     const snapshot = await getDocs(q);
     if (snapshot.empty) return null;
     const docSnap = snapshot.docs[0];
-    return { id: docSnap.id, ...docSnap.data() } as PlayerProfile;
+    return mergeProfile(docSnap.id, docSnap.data(), await getMyPrivate(docSnap.id));
   } catch {
     return null;
   }
 }
 
 /**
- * Follows the player doc so changes made elsewhere (a photo set in the app,
- * the server clearing it) show up without a reload. Returns the unsubscribe.
+ * Follows the player's public and private docs so changes made elsewhere (a
+ * photo set in the app, the server clearing it, a postal code changed in the
+ * app) show up without a reload. Returns the unsubscribe.
  */
 export function watchPlayer(
   id: string,
   onChange: (player: PlayerProfile | null) => void
 ): () => void {
-  return onSnapshot(
+  let pub: DocumentData | null | undefined; // undefined = not loaded yet
+  let priv: DocumentData | null = null;
+  const emit = () => {
+    if (pub === undefined) return;
+    onChange(pub ? mergeProfile(id, pub, priv) : null);
+  };
+  const stopPublic = onSnapshot(
     doc(db, "players", id),
-    (snap) => onChange(snap.exists() ? ({ id: snap.id, ...snap.data() } as PlayerProfile) : null),
+    (snap) => { pub = snap.exists() ? snap.data() : null; emit(); },
     () => { /* keep the last known profile */ }
   );
+  const stopPrivate = onSnapshot(
+    doc(db, "playerPrivate", id),
+    (snap) => { priv = snap.exists() ? snap.data() : null; emit(); },
+    () => { /* not readable yet: keep the public fallback */ }
+  );
+  return () => { stopPublic(); stopPrivate(); };
 }
 
 export async function createPlayer(
   firebaseUid: string,
   data: CreatePlayerPayload
 ): Promise<PlayerProfile> {
-  // Check if profile already exists for this UID
+  const privateInput: PrivateProfileInput = {};
+  if (data.dateOfBirth) privateInput.dateOfBirth = Date.parse(data.dateOfBirth);
+  if (data.homePostalCode?.trim()) privateInput.homePostalCode = data.homePostalCode.trim();
+
+  // A profile already exists for this UID (for example a retry after the
+  // private details failed to save): save the private details again.
+  // Firebase Auth already allows only one account per email, so there is no
+  // separate email check (that query exposed who has an account).
   const existingByUid = query(
     playersRef,
     where("firebaseUid", "==", firebaseUid),
@@ -112,32 +180,23 @@ export async function createPlayer(
   const uidSnap = await getDocs(existingByUid);
   if (!uidSnap.empty) {
     const existing = uidSnap.docs[0];
-    return { id: existing.id, ...existing.data() } as PlayerProfile;
-  }
-
-  // Check for duplicate email
-  const existingByEmail = query(
-    playersRef,
-    where("email", "==", data.email.toLowerCase()),
-    limit(1)
-  );
-  const emailSnap = await getDocs(existingByEmail);
-  if (!emailSnap.empty) {
-    throw new Error("An account with this email already exists.");
+    if (Object.keys(privateInput).length > 0) await savePrivate(privateInput);
+    return mergeProfile(existing.id, existing.data(), await getMyPrivate(existing.id));
   }
 
   const id = crypto.randomUUID();
   const playerDoc: Record<string, unknown> = {
     name: data.name.trim(),
-    phone: data.phone?.trim() ?? "",
-    email: data.email.toLowerCase().trim(),
+    // Placeholders only: older iOS versions drop a player whose doc lacks
+    // these keys. The real email is kept privately (from Auth, by the server).
+    email: "",
+    phone: "",
     genderRaw: data.gender,
     elo: 1200,
     streak: 0,
     firebaseUid,
     avatarId: data.avatarId ?? "shuttlecock",
     homeCountryCode: data.homeCountryCode ?? null,
-    homePostalCode: data.homePostalCode ?? null,
     createdAt: Timestamp.now(),
   };
 
@@ -148,23 +207,33 @@ export async function createPlayer(
     playerDoc.preferredSport = data.preferredSport;
   }
 
-  if (data.dateOfBirth) {
-    playerDoc.dateOfBirth = Timestamp.fromDate(new Date(data.dateOfBirth));
-  }
-
   await setDoc(doc(db, "players", id), playerDoc);
 
-  return { id, ...playerDoc } as unknown as PlayerProfile;
+  // DOB and postal code go only to the owner-only private doc.
+  if (Object.keys(privateInput).length > 0) await savePrivate(privateInput);
+
+  return mergeProfile(id, playerDoc, await getMyPrivate(id));
+}
+
+async function savePrivate(input: PrivateProfileInput): Promise<void> {
+  try {
+    await updatePrivateProfile(input);
+  } catch (err) {
+    console.error("updatePrivateProfile failed", err);
+    throw new Error(
+      "Your profile was created, but we couldn't save your date of birth and zip code. Please try again."
+    );
+  }
 }
 
 /**
  * Profile basics only. Photo fields (`photoURL`, `photoPath`,
  * `photoUpdatedAt`) are server-written via `setProfilePhoto` /
- * `removeProfilePhoto` and must never be added here.
+ * `removeProfilePhoto` and must never be added here. `homePostalCode` and
+ * `weightKg` are private and go through the `updatePrivateProfile` callable.
  */
 export interface UpdatePlayerPayload {
   name?: string;
-  phone?: string;
   avatarId?: string;
   homeCountryCode?: string;
   homePostalCode?: string;
@@ -188,15 +257,25 @@ export async function updatePlayer(
     throw new Error("You can only update your own profile.");
   }
 
+  const privateInput: PrivateProfileInput = {};
+  if (data.homePostalCode !== undefined) privateInput.homePostalCode = data.homePostalCode.trim();
+  if (data.weightKg !== undefined) privateInput.weightKg = data.weightKg;
+
   const updates: Record<string, unknown> = {};
   if (data.name !== undefined) updates.name = data.name.trim();
-  if (data.phone !== undefined) updates.phone = data.phone.trim();
   if (data.avatarId !== undefined) updates.avatarId = data.avatarId;
   if (data.homeCountryCode !== undefined) updates.homeCountryCode = data.homeCountryCode;
-  if (data.homePostalCode !== undefined) updates.homePostalCode = data.homePostalCode;
-  if (data.weightKg !== undefined) updates.weightKg = data.weightKg;
 
-  await updateDoc(docRef, updates);
+  if (Object.keys(privateInput).length > 0) {
+    await updatePrivateProfile(privateInput);
+    // Remove an older public copy of what was just saved privately, so it
+    // stops being public and can't be copied back over the new value.
+    for (const key of Object.keys(privateInput)) {
+      if (key in existing) updates[key] = deleteField();
+    }
+  }
+
+  if (Object.keys(updates).length > 0) await updateDoc(docRef, updates);
 }
 
 export async function getMatchStats(playerId: string): Promise<MatchStats> {

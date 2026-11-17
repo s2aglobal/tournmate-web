@@ -3,7 +3,7 @@ export default function PrivacyPage() {
     <main className="legal-page">
       <h1>Privacy Policy</h1>
       <p className="legal-meta">
-        Effective Date: April 1, 2026 &nbsp;|&nbsp; Last Updated: November 16, 2026
+        Effective Date: April 1, 2026 &nbsp;|&nbsp; Last Updated: November 17, 2026
       </p>
 
       <div className="legal-content">
@@ -21,8 +21,9 @@ export default function PrivacyPage() {
         <p>We may collect the following types of information:</p>
         <ul>
           <li>
-            <strong>Personal Information:</strong> Name, email address, phone
-            number, date of birth.
+            <strong>Personal Information:</strong> Name, email address, date of
+            birth. We no longer ask for a phone number; if you added one in an
+            earlier version of the App, we keep it private to your account.
           </li>
           <li>
             <strong>Usage Data:</strong> App interactions, device information, IP
@@ -189,7 +190,9 @@ export default function PrivacyPage() {
             <strong>Other players:</strong> Your name, profile photo, teams,
             scores and results are visible to people in tournaments and sessions
             you join. Sportsmanship reviews are visible on the rated
-            player&apos;s profile.
+            player&apos;s profile. Your contact details (email address and any
+            phone number) are private to your account: we do not show them or
+            make them available to other players.
           </li>
           <li>
             <strong>Service Providers:</strong> Companies that operate the App
