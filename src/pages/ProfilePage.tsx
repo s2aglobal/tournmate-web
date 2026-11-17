@@ -182,8 +182,9 @@ export default function ProfilePage() {
       await refreshPlayer();
       setEditingRegion(false);
       setMessage("Home area updated!");
-    } catch {
-      setMessage("Failed to update home area.");
+    } catch (err) {
+      // The postal code is validated by the updatePrivateProfile callable.
+      setMessage(`Failed to update home area. ${callableErrorMessage(err, "")}`.trim());
     } finally {
       setSaving(false);
     }
@@ -251,7 +252,7 @@ export default function ProfilePage() {
             <h3 className="profile-section-title">Contact</h3>
             <div className="profile-row">
               <span className="profile-row-label">Email</span>
-              <span className="profile-row-value">{player.email}</span>
+              <span className="profile-row-value">{user.email}</span>
             </div>
             {player.phone && (
               <div className="profile-row">

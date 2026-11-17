@@ -60,7 +60,6 @@ export default function ProfileSetupPage() {
 
   // Step 1 — profile fields
   const [name, setName] = useState(user?.displayName ?? "");
-  const [phone, setPhone] = useState("");
   const [gender, setGender] = useState<"male" | "female">("male");
   const [dateOfBirth, setDateOfBirth] = useState("");
   // None picked in the UI; DEFAULT_AVATAR_ID is saved if the user skips it.
@@ -158,8 +157,6 @@ export default function ProfileSetupPage() {
     try {
       await createPlayer(user.uid, {
         name: name.trim(),
-        email: user.email,
-        phone: phone.trim(),
         gender,
         avatarId: selectedAvatar ?? DEFAULT_AVATAR_ID,
         homeCountryCode: homeCountryCode || undefined,
@@ -246,19 +243,6 @@ export default function ProfileSetupPage() {
                   Used for age verification and tournament eligibility
                 </p>
               )}
-            </div>
-
-            <div className="form-group">
-              <label htmlFor="phone">Phone (optional)</label>
-              <input
-                id="phone"
-                type="tel"
-                className="form-input"
-                placeholder="+1 (555) 000-0000"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                autoComplete="tel"
-              />
             </div>
 
             <div className="form-group">

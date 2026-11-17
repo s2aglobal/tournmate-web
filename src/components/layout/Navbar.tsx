@@ -85,7 +85,7 @@ export default function Navbar() {
                       <PlayerAvatar photoURL={player.photoURL} avatarId={player.avatarId} nameSeed={player.name} className="nav-dropdown-avatar" />
                       <div>
                         <div className="nav-dropdown-name">{player.name}</div>
-                        <div className="nav-dropdown-email">{player.email}</div>
+                        <div className="nav-dropdown-email">{user?.email}</div>
                       </div>
                     </div>
                   )}
