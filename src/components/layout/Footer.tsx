@@ -7,6 +7,7 @@ export default function Footer() {
         <Link to="/">Home</Link>
         <Link to="/terms">Terms &amp; Conditions</Link>
         <Link to="/privacy">Privacy Policy</Link>
+        <Link to="/community-guidelines">Community Guidelines</Link>
         <a href="mailto:contact@s2agloballlc.com">Contact</a>
       </div>
       <div className="footer-social">
