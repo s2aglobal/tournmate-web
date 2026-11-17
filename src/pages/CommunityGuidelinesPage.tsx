@@ -12,7 +12,7 @@ export default function CommunityGuidelinesPage() {
         <p>
           TournMate is for people who love playing sport together. These
           guidelines apply to everything you post or share in the app,
-          including sportsmanship reviews and live video. Breaking them can get
+          including sportsmanship reviews. Breaking them can get
           your content removed.
         </p>
 
@@ -52,22 +52,7 @@ export default function CommunityGuidelinesPage() {
           fake reviews or rate people you haven&apos;t played with.
         </p>
 
-        <h2>5. Live video</h2>
-        <ul>
-          <li>Only film matches where everyone being filmed agrees to it.</li>
-          <li>
-            Minors may only be filmed with the consent of a parent or guardian.
-          </li>
-          <li>
-            Never film in changing rooms, toilets or other private areas.
-          </li>
-          <li>
-            Stop filming if someone asks you to, and keep the stream about the
-            match.
-          </li>
-        </ul>
-
-        <h2>6. How reports work</h2>
+        <h2>5. How reports work</h2>
         <ul>
           <li>
             Anyone can report a review from the &ldquo;&hellip;&rdquo; menu
@@ -83,11 +68,11 @@ export default function CommunityGuidelinesPage() {
           </li>
           <li>
             People who break these guidelines repeatedly can lose access to
-            ratings or live streaming.
+            ratings.
           </li>
         </ul>
 
-        <h2>7. Contact</h2>
+        <h2>6. Contact</h2>
         <p>
           Questions, or something we should look at? Email us at{" "}
           <a href="mailto:contact@s2agloballlc.com">contact@s2agloballlc.com</a>.

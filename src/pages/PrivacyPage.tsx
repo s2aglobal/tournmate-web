@@ -3,7 +3,7 @@ export default function PrivacyPage() {
     <main className="legal-page">
       <h1>Privacy Policy</h1>
       <p className="legal-meta">
-        Effective Date: April 1, 2026 &nbsp;|&nbsp; Last Updated: November 13, 2026
+        Effective Date: April 1, 2026 &nbsp;|&nbsp; Last Updated: November 16, 2026
       </p>
 
       <div className="legal-content">
@@ -80,12 +80,13 @@ export default function PrivacyPage() {
             notifications you have allowed.
           </li>
           <li>
-            <strong>Camera and microphone:</strong> Used only when you take a
-            profile photo or, as a tournament organizer, live stream a match.
+            <strong>Camera:</strong> Used only when you take a profile photo.
           </li>
           <li>
-            <strong>YouTube account (organizers only, optional):</strong> See
-            Section 4, Google User Data.
+            <strong>Sportsmanship reviews:</strong> Star ratings and comments
+            you write about other players, and reports you send about reviews.
+            Reviews are shown on the rated player&apos;s profile, with your name
+            and photo unless you choose to post anonymously.
           </li>
         </ul>
 
@@ -102,10 +103,9 @@ export default function PrivacyPage() {
             Show your name, profile photo and results to other players in
             tournaments and sessions you take part in.
           </li>
-          <li>Let organizers live stream matches (see Section 4).</li>
           <li>
-            Keep the App safe, including moderating profile photos and
-            preventing abuse.
+            Keep the App safe, including moderating profile photos and review
+            comments, and preventing abuse.
           </li>
           <li>Improve app performance and user experience.</li>
           <li>
@@ -125,17 +125,6 @@ export default function PrivacyPage() {
             <code>email</code>, <code>profile</code>): your name, email address
             and profile picture.
           </li>
-          <li>
-            <strong>YouTube</strong> (scope:{" "}
-            <code>https://www.googleapis.com/auth/youtube</code>): requested only
-            if you are a tournament organizer and choose{" "}
-            <strong>Connect YouTube</strong> to live stream a match. We use this
-            access only to create a live broadcast on your own YouTube channel,
-            set it to unlisted, start and end it, and read its status (for
-            example whether it is live and how many people are watching). We do
-            not read, change or delete your other videos, playlists,
-            subscriptions, comments or channel settings.
-          </li>
         </ul>
         <h3>How we use it</h3>
         <ul>
@@ -144,28 +133,13 @@ export default function PrivacyPage() {
             identify you when you sign in, and show your name and photo to other
             players in tournaments you join.
           </li>
-          <li>
-            YouTube access is used only to run live streams you start. Each
-            stream is published to your YouTube channel as an unlisted video so
-            that people following the tournament can watch it inside TournMate.
-            You can end a stream at any time.
-          </li>
         </ul>
         <h3>How we store it</h3>
         <ul>
           <li>
             Your name, email address and profile picture are stored in your
-            TournMate account on Google Firebase.
-          </li>
-          <li>
-            YouTube access tokens are stored securely on your device. We never
-            see your Google password, and we do not store YouTube tokens on our
-            servers.
-          </li>
-          <li>
-            For each live stream we store the YouTube video ID, start and end
-            time and viewer counts, so the stream and its replay can be shown in
-            the tournament.
+            TournMate account on Google Firebase. We never see your Google
+            password.
           </li>
         </ul>
         <h3>How we share it</h3>
@@ -176,25 +150,15 @@ export default function PrivacyPage() {
             provider, Google Firebase), to comply with the law, or with your
             consent.
           </li>
-          <li>
-            Live streams can be watched by anyone who views the tournament in
-            TournMate or has the stream link. Your YouTube channel name may be
-            visible on YouTube.
-          </li>
         </ul>
         <h3>Removing access and deleting data</h3>
         <ul>
           <li>
-            You can disconnect YouTube in the App at any time, or revoke
-            TournMate&apos;s access from your Google account at{" "}
+            You can revoke TournMate&apos;s access from your Google account at{" "}
             <a href="https://myaccount.google.com/permissions" target="_blank" rel="noopener noreferrer">
               myaccount.google.com/permissions
             </a>
             .
-          </li>
-          <li>
-            Broadcasts created on your channel belong to you and can be deleted
-            in YouTube Studio.
           </li>
           <li>
             Deleting your TournMate account removes the Google data we store, as
@@ -208,18 +172,6 @@ export default function PrivacyPage() {
             Google API Services User Data Policy
           </a>
           , including the Limited Use requirements.
-        </p>
-        <p>
-          <strong>YouTube API Services:</strong> Live streaming uses YouTube API
-          Services. By connecting YouTube you agree to the{" "}
-          <a href="https://www.youtube.com/t/terms" target="_blank" rel="noopener noreferrer">
-            YouTube Terms of Service
-          </a>
-          . Google&apos;s handling of your data is described in the{" "}
-          <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer">
-            Google Privacy Policy
-          </a>
-          .
         </p>
 
         <h2>5. Payments Disclaimer</h2>
@@ -236,7 +188,8 @@ export default function PrivacyPage() {
           <li>
             <strong>Other players:</strong> Your name, profile photo, teams,
             scores and results are visible to people in tournaments and sessions
-            you join. Live streams are visible as described in Section 4.
+            you join. Sportsmanship reviews are visible on the rated
+            player&apos;s profile.
           </li>
           <li>
             <strong>Service Providers:</strong> Companies that operate the App
@@ -244,7 +197,7 @@ export default function PrivacyPage() {
             (authentication, database, file storage, cloud functions,
             notifications, analytics and crash reporting), Google Cloud Vision
             (automatic profile photo moderation), Google Maps Platform (nearby
-            courts) and YouTube API Services (live streaming).
+            courts).
           </li>
           <li>
             <strong>Legal Requirements:</strong> If required by law, regulation,
@@ -345,7 +298,7 @@ export default function PrivacyPage() {
           The App integrates with third-party services including Firebase
           (Google: Authentication, Firestore, Cloud Messaging, Analytics and
           Crashlytics, Cloud Storage, Cloud Functions), Google Cloud Vision,
-          Google Maps Platform, YouTube API Services, Apple HealthKit, Google
+          Google Maps Platform, Apple HealthKit, Google
           Health Connect, Apple Sign-In, Google Sign-In, and DiceBear. These
           services have their own privacy policies, including the{" "}
           <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer">
